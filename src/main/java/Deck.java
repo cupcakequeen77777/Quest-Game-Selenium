@@ -46,7 +46,7 @@ public class Deck {
     }
 
     public void addAll(Deck d) {
-        deck = d.getDeck();
+        deck.addAll(d.getDeck());
     }
 
     public Card drawCard() {

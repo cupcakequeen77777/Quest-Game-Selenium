@@ -1,4 +1,4 @@
-import java.util.Objects;
+
 
 public class Card {
     int cardValue;
@@ -57,7 +57,7 @@ public class Card {
         return "";
     }
 
-    // TODO: Displaying the hand of a player means listing foes first in increasing order, then weapons, also in increasing order, with swords before horses.
+    // Displaying the hand of a player means listing foes first in increasing order, then weapons, also in increasing order, with swords before horses.
     public int compare(Card card) {
         if (type.equals("F") && !card.type.equals("F")) {
             return -1;

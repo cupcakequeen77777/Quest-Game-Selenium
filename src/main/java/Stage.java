@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.List;
 
 public class Stage {
     Card foeCard;
@@ -38,7 +37,7 @@ public class Stage {
 
     public boolean isValidCard(Card card) {
         // Check if the card is a foe or weapon
-        if (!card.type.equals("F") && !card.isWeapon()) { // FIXME: weapons check in card class if weapon
+        if (!card.type.equals("F") && !card.isWeapon()) {
             return false;
         }
 

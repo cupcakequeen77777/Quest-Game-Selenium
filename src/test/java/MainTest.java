@@ -10,6 +10,7 @@ import org.mockito.Mockito.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -124,7 +125,7 @@ class MainTest {
                 "L", "L", "L", "L", "L", "L",
                 "E", "E"};
 
-        deck.sort();
+//        deck.sort();
 
         for (int i = numberFoeCards; i < numberFoeCards + numberWeaponCards; i++) {
             assertEquals(wValue[i - 50], deck.getCard(i).getValue());
@@ -149,16 +150,16 @@ class MainTest {
         int numberQuests = qValue.length;
         int[] eValue = {1, 2, 2, 3, 3};
 
-//        for (int i = 0; i < numberQuests; i++) {
-//            assertEquals(qValue[i], deck.getCard(i).getValue());
-//            assertEquals("Q", deck.getCard(i).GetType());
-//        }
-//
-//        for (int i = numberQuests; i < deck.size(); i++) {
-//            System.out.println(deck.getCard(i).GetType() + deck.getCard(i).getValue());
-//            assertEquals(eValue[i - numberQuests], deck.getCard(i).getValue());
-//            assertEquals("E", deck.getCard(i).GetType());
-//        }
+        for (int i = 0; i < numberQuests; i++) {
+            assertEquals(qValue[i], deck.getCard(i).getValue());
+            assertEquals("Q", deck.getCard(i).GetType());
+
+        }
+
+        for (int i = numberQuests; i < deck.size(); i++) {
+            assertEquals(eValue[i - numberQuests], deck.getCard(i).getValue());
+            assertEquals("E", deck.getCard(i).GetType());
+        }
 
     }
 
@@ -221,7 +222,6 @@ class MainTest {
         assertTrue(game.checkForWinner());
     }
 
-    // QUESTION: What to do if you realize you need another test?
 
     @Test
     @DisplayName("Game displays the id of each winner and then terminates, one winner")
@@ -434,8 +434,6 @@ class MainTest {
         assertEquals(12, game.players.get(1).hand.size());
         assertEquals(12, game.players.get(2).hand.size());
         assertEquals(12, game.players.get(3).hand.size());
-
-        System.out.println(output);
 
     }
 
@@ -696,7 +694,7 @@ class MainTest {
         setUpQuest(mockScanner);
 
         when(mockScanner.nextLine()).
-                thenReturn("4", "4", "quit").thenReturn("4", "3", "quit").thenReturn("3", "5", "quit");
+                thenReturn("4", "4", "quit", "").thenReturn("4", "3", "quit", "").thenReturn("3", "5", "quit", "");
         game.handleParticipantAttacks();
 
         assertEquals(15, game.players.get(0).attackValue);
@@ -723,7 +721,7 @@ class MainTest {
 
 
         when(mockScanner.nextLine()).
-                thenReturn("4", "4", "quit").thenReturn("4", "quit").thenReturn("3", "5", "quit");
+                thenReturn("4", "4", "quit", "").thenReturn("4", "quit", "").thenReturn("3", "5", "quit", "");
         game.handleParticipantAttacks();
 
 
@@ -733,7 +731,6 @@ class MainTest {
     }
 
     @Test
-//    @Disabled
     @DisplayName("Game handles the completion of a quest and updates shields")
     void RESP_16_test_01() {
         StringWriter output = new StringWriter();
@@ -741,16 +738,14 @@ class MainTest {
         initializeGame(mockScanner, output);
 
         setInitialHands(game);
-
         setUpQuest(mockScanner);
-
-
+        game.quest.currentStage = 3;
         when(mockScanner.nextLine()).
-                thenReturn("4", "4", "quit").thenReturn("4", "3", "quit").thenReturn("3", "5", "quit");
+                thenReturn("4", "4", "quit", "").thenReturn("4", "3", "quit", "").thenReturn("3", "5", "quit", "");
         game.handleParticipantAttacks();
-
-
         game.resolveStage();
+
+        System.out.println(output);
         assertEquals(0, game.players.get(0).shields);
         assertEquals(0, game.players.get(2).attack.size());
         assertEquals(0, game.players.get(3).attack.size());
@@ -770,7 +765,7 @@ class MainTest {
 
 
         when(mockScanner.nextLine()).
-                thenReturn("4", "4", "quit").thenReturn("4", "quit").thenReturn("3", "5", "quit");
+                thenReturn("4", "4", "quit", "").thenReturn("4", "quit", "").thenReturn("3", "5", "quit", "");
         game.handleParticipantAttacks();
 
 
@@ -788,7 +783,6 @@ class MainTest {
     }
 
     @Test
-//    @Disabled
     @DisplayName("Game discards cards used by the sponsor and updates their hand, who then draws the same number of cards + the number of stages, and then possibly trims their hand")
     void RESP_18_test_01() {
         StringWriter output = new StringWriter();
@@ -799,18 +793,24 @@ class MainTest {
         setInitialHands(game);
         setUpQuest(mockScanner);
         when(mockScanner.nextLine()).
-                thenReturn("4", "4", "quit").thenReturn("4", "quit").thenReturn("3", "5", "quit");
+                thenReturn("4", "4", "quit", "").thenReturn("4", "quit", "").thenReturn("3", "5", "quit", "");
         game.handleParticipantAttacks();
 
         game.quest.stages.get(3).participants = game.quest.stages.get(game.quest.currentStage).participants;
         game.quest.stages.get(3).value = 15;
         game.quest.currentStage = 3;
 
-        when(mockScanner.nextLine()).
-                thenReturn("0");
+        when(mockScanner.nextLine()).thenReturn("0");
         game.resolveStage();
 
+        System.out.println(game.adventureDeck.size() + game.adventureDiscardDeck.size() + game.players.get(1).hand.size() + game.players.get(0).hand.size() + game.players.get(2).hand.size() + game.players.get(3).hand.size() + game.players.get(0).attack.size() + game.players.get(1).attack.size() + game.players.get(2).attack.size() + game.players.get(3).attack.size() + game.quest.stages.get(0).weaponCards.size() + game.quest.stages.get(1).weaponCards.size() + game.quest.stages.get(2).weaponCards.size() + game.quest.stages.get(3).weaponCards.size() + 4); // REMOVE
+
         assertEquals(12, game.players.get(1).hand.size());
+        assertTrue(game.quest.stages.get(0).weaponCards.isEmpty());
+        assertNull(game.quest.stages.get(0).foeCard);
+
+        assertTrue(game.quest.stages.get(1).weaponCards.isEmpty());
+        assertTrue(game.quest.stages.get(2).weaponCards.isEmpty());
 
     }
 
@@ -906,7 +906,7 @@ class MainTest {
     public void rigQuest(Quest quest) {
         Stage stage = new Stage();
         Player p2 = game.players.get(1);
-        System.out.println(p2.hand);
+
         stage.foeCard = p2.hand.removeCard(new Card(5, "F", true));
         stage.weaponCards.add(p2.hand.removeCard(new Card(10, "H", true)));
         stage.calculateValue();
@@ -936,7 +936,7 @@ class MainTest {
 
     @Test
     @DisplayName("A-TEST JP-Scenario")
-    void A_TEST_JP_Scenario() {
+    void A_TEST_JP_Scenario2() {
         StringWriter output = new StringWriter();
         Scanner mockScanner = mock(Scanner.class);
         initializeGame(mockScanner, output);
@@ -989,14 +989,15 @@ class MainTest {
         p3.addCard(game.adventureDeck.removeCard(new Card(10, "S", true)));
         p4.addCard(game.adventureDeck.removeCard(new Card(15, "B", true)));
 
-        when(mockScanner.nextLine()).
-                thenReturn("0", "0", "0");
+        when(mockScanner.nextLine()).thenReturn("0", "0", "0", "");
         game.trimCards();
 
+
         when(mockScanner.nextLine()).
-                thenReturn("4", "4", "quit").thenReturn("4", "3", "quit").thenReturn("3", "5", "quit");
+                thenReturn("4", "4", "quit", "").thenReturn("4", "3", "quit", "").thenReturn("3", "5", "quit", "");
 
         game.handleParticipantAttacks();
+
         game.resolveStage();
 
         /*
@@ -1006,8 +1007,7 @@ class MainTest {
         c. P4 is asked and decides to participate. P4 draws a Lance
          */
 
-        when(mockScanner.nextLine()).
-                thenReturn("y", "y", "y");
+        when(mockScanner.nextLine()).thenReturn("y", "y", "y");
 
         game.participateInQuest();
 
@@ -1023,9 +1023,10 @@ class MainTest {
          */
 
         when(mockScanner.nextLine()).
-                thenReturn("6", "5", "quit").thenReturn("8", "7", "quit").thenReturn("5", "6", "quit");
+                thenReturn("6", "5", "quit", "").thenReturn("8", "7", "quit", "").thenReturn("5", "6", "quit", "");
 
         game.handleParticipantAttacks();
+
         game.resolveStage();
 
         // Assert P1 has no shields and their hand is F5 F10 F15 F15 F30 Horse Axe Axe Lance (displayed in this order)
@@ -1063,7 +1064,7 @@ class MainTest {
          */
 
         when(mockScanner.nextLine()).
-                thenReturn("8", "5", "3", "quit").thenReturn("6", "4", "5", "quit");
+                thenReturn("8", "5", "3", "quit", "").thenReturn("6", "4", "5", "quit");
 
         game.handleParticipantAttacks();
         game.resolveStage();
@@ -1083,7 +1084,7 @@ class MainTest {
         p4.addCard(game.adventureDeck.removeCard(new Card(20, "L", true)));
 
         when(mockScanner.nextLine()).
-                thenReturn("6", "5", "5", "quit").thenReturn("3", "3", "3", "4", "quit");
+                thenReturn("6", "5", "5", "quit", "").thenReturn("3", "3", "3", "4", "quit", "");
 
         game.handleParticipantAttacks();
         /*
@@ -1102,6 +1103,183 @@ class MainTest {
             ii. assert P4 has 4 shields and has the cards: F15 F15 F40 Lance
          */
 
+        assertEquals(0, p3.shields);
+        assertEquals("F5 F5 F15 F30 Sword ", p3.handToString());
+
+        assertEquals(4, p4.shields);
+        assertEquals("F15 F15 F40 Lance ", p4.handToString());
+
+        //  assert P2 has 12 cards in hand
+        assertEquals(12, p2.hand.size());
+
+    }
+
+    @Test
+    @DisplayName("A-TEST JP-Scenario")
+    void A_TEST_JP_Scenario() {
+        StringWriter output = new StringWriter();
+        Scanner mockScanner = mock(Scanner.class);
+        initializeGame(mockScanner, output);
+
+        Player p1 = game.players.get(0);
+        Player p2 = game.players.get(1);
+        Player p3 = game.players.get(2);
+        Player p4 = game.players.get(3);
+
+
+        // Start game, decks are created, hands of the 4 players are set up with random cards
+        game.InitializeAdventureDeck();
+        game.InitializeEventDeck();
+        game.adventureDeck.shuffle();
+        game.eventDeck.shuffle();
+        game.distributeCards();
+
+        // Rig the 4 hands to the hold the cards of the 4 posted initial hands
+        rigInitialHands(game);
+        rigAdventureEventDeck(game);
+
+        Card quest = game.drawEventCard();
+
+        game.displayHand(game.playerTurn);
+
+        game.startTurn(quest);
+        game.displayHand(game.playerTurn);
+
+        when(mockScanner.nextLine()).
+                thenReturn("n", "y");
+        game.requestSponsorships();
+
+        when(mockScanner.nextLine()).
+                thenReturn("0", "6", "quit").
+                thenReturn("1", "4", "quit").
+                thenReturn("1", "2", "3", "quit").
+                thenReturn("1", "2", "quit");
+
+        game.sponsorSetsUpQuest(game.players.get(game.playerTurn));
+
+        game.eligibleParticipants();
+
+        when(mockScanner.nextLine()).thenReturn("y", "y", "y");
+
+        game.participateInQuest();
+
+        p1.addCard(game.adventureDeck.drawCard());
+        p3.addCard(game.adventureDeck.drawCard());
+        p4.addCard(game.adventureDeck.drawCard());
+
+        when(mockScanner.nextLine()).thenReturn("0", "0", "0", "");
+        game.trimCards();
+
+
+        when(mockScanner.nextLine()).
+                thenReturn("4", "4", "quit", "").thenReturn("4", "3", "quit", "").thenReturn("3", "5", "quit", "");
+
+        game.handleParticipantAttacks();
+
+        game.resolveStage();
+
+        /*
+        Stage 2:
+        a. P1 is asked and decides to participate. P1 draws a F10
+        b. P3 is asked and decides to participate. P3 draws a Lance
+        c. P4 is asked and decides to participate. P4 draws a Lance
+         */
+
+        when(mockScanner.nextLine()).thenReturn("y", "y", "y");
+
+        game.participateInQuest();
+
+        p1.addCard(game.adventureDeck.drawCard());
+        p3.addCard(game.adventureDeck.drawCard());
+        p4.addCard(game.adventureDeck.drawCard());
+
+        /*
+        d. P1 sees their hand and builds an attack: Horse + Sword => value of 20
+        e. P3 sees their hand and builds an attack: Axe + Sword => value of 25
+        f. P4 sees their hand and builds an attack: Horse + Axe=> value of 25
+
+         */
+
+        when(mockScanner.nextLine()).
+                thenReturn("6", "5", "quit", "").thenReturn("8", "7", "quit", "").thenReturn("5", "6", "quit", "");
+
+        game.handleParticipantAttacks();
+
+        game.resolveStage();
+
+        // Assert P1 has no shields and their hand is F5 F10 F15 F15 F30 Horse Axe Axe Lance (displayed in this order)
+        assertEquals(0, p1.shields);
+        assertEquals("F5 F10 F15 F15 F30 Horse Axe Axe Lance ", p1.handToString());
+
+        /*
+        Stage 3:
+            a. P3 is asked and decides to participate. P3 draws an Axe
+            b. P4 is asked and decides to participate. P4 draws a Sword
+            c. P3 sees their hand and builds an attack: Lance + Horse + Sword => value of
+            40
+            d. P4 sees their hand and builds an attack: Axe + Sword + Lance => value of 45
+            e. Resolution: P3’s and P4’s attack are su[icient go onto the next stage
+            f. All 2 participants discard the cards used for their attacks
+         */
+
+        when(mockScanner.nextLine()).
+                thenReturn("y", "y");
+
+        game.participateInQuest();
+
+        p3.addCard(game.adventureDeck.drawCard());
+        p4.addCard(game.adventureDeck.drawCard());
+
+        /*
+        Stage 3:
+            a. P3 is asked and decides to participate. P3 draws an Axe
+            b. P4 is asked and decides to participate. P4 draws a Sword
+            c. P3 sees their hand and builds an attack: Lance + Horse + Sword => value of
+            40
+            d. P4 sees their hand and builds an attack: Axe + Sword + Lance => value of 45
+            e. Resolution: P3’s and P4’s attack are sufficient go onto the next stage
+            f. All 2 participants discard the cards used for their attacks
+         */
+
+        when(mockScanner.nextLine()).
+                thenReturn("8", "5", "3", "quit", "").thenReturn("6", "4", "5", "quit");
+
+        game.handleParticipantAttacks();
+        game.resolveStage();
+
+        /*
+        Stage 4:
+            a. P3 is asked and decides to participate. P3 draws a F30
+            b. P4 is asked and decides to participate. P4 draws a Lance
+            c. P3 sees their hand and builds an attack: Axe + Horse + Lance=> value of 45
+            d. P4 sees their hand and builds an attack: Dagger + Sword + Lance + Excalibur
+            => value of 65
+         */
+
+        when(mockScanner.nextLine()).thenReturn("y", "y");
+        game.participateInQuest();
+        p3.addCard(game.adventureDeck.drawCard());
+        p4.addCard(game.adventureDeck.drawCard());
+
+        when(mockScanner.nextLine()).
+                thenReturn("6", "5", "5", "quit", "").thenReturn("3", "3", "3", "4", "quit", "");
+
+        game.handleParticipantAttacks();
+        /*
+        P2 discards all 9 cards used in the quest and draws 9+4 = 13 random cards and then trims down to 12 cards. It does not matter which cards are selected to discard.
+         */
+        when(mockScanner.nextLine()).
+                thenReturn("0");
+        game.resolveStage();
+
+        /*
+        e. Resolution:
+            i. P3’s attack is insufficient – P3 loses and receives no shields
+            ii. P4’s attack is sufficient – P4 receives 4 shields
+            f. All 2 participants discard the cards used for their attacks
+            i. assert P3 has no shields and has the 5 cards: F5 F5 F15 F30 Sword
+            ii. assert P4 has 4 shields and has the cards: F15 F15 F40 Lance
+         */
 
         assertEquals(0, p3.shields);
         assertEquals("F5 F5 F15 F30 Sword ", p3.handToString());
@@ -1112,9 +1290,27 @@ class MainTest {
         //  assert P2 has 12 cards in hand
         assertEquals(12, p2.hand.size());
 
+    }
 
-//        System.out.println(output);
 
+    public void rigAdventureEventDeck(Main game) {
+        Deck adventureDeck = game.adventureDeck;
+        Deck eventDeck = game.eventDeck;
+
+        eventDeck.add(eventDeck.removeCard(new Card(4, "Q", false)));
+        Collections.reverse(eventDeck.deck);
+
+        adventureDeck.add(adventureDeck.removeCard(new Card(20, "L", true)));
+        adventureDeck.add(adventureDeck.removeCard(new Card(30, "F", false)));
+        adventureDeck.add(adventureDeck.removeCard(new Card(10, "S", true)));
+        adventureDeck.add(adventureDeck.removeCard(new Card(15, "B", true)));
+        adventureDeck.add(adventureDeck.removeCard(new Card(20, "L", true)));
+        adventureDeck.add(adventureDeck.removeCard(new Card(20, "L", true)));
+        adventureDeck.add(adventureDeck.removeCard(new Card(10, "F", false)));
+        adventureDeck.add(adventureDeck.removeCard(new Card(15, "B", true)));
+        adventureDeck.add(adventureDeck.removeCard(new Card(10, "S", true)));
+        adventureDeck.add(adventureDeck.removeCard(new Card(30, "F", false)));
+        Collections.reverse(adventureDeck.deck);
     }
 
 }

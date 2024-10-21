@@ -1,5 +1,4 @@
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -59,54 +58,48 @@ public class Player {
 
     public int setupAttack(Scanner input, PrintWriter output) {
         output.print("Player " + playerNumber + " set up your attack.\n");
-        System.out.println("Player " + playerNumber + " set up your attack.\n");
+        output.flush();
 
         while (true) {
-            System.out.println(handToString() + "\n" + "Select cards for the stage attack: ");
             output.print(handToString() + "\n");
+            output.flush();
             output.print("Select cards for the stage attack: ");
+            output.flush();
             String userInput = input.nextLine();
-            System.out.println(userInput + "\n");
             output.print(userInput + "\n");
             output.flush();
             if (userInput.equalsIgnoreCase("quit")) {
                 break;
             }
-            int cardIndex = Integer.parseInt(userInput);
+            int cardIndex;
+            try {
+                cardIndex = Integer.parseInt(userInput);
+            } catch (NumberFormatException _) {
+                continue;
+            }
 
             if (cardIndex >= 0 && cardIndex < hand.size()) {
                 Card card = hand.removeCard(cardIndex);
                 // Validate card type (foe or weapon) and uniqueness within the stage
                 if (isValidAttackCard(card)) {
                     attack.add(card);
-                    System.out.println("Selected: " + card + "\n");
                     output.print("Selected: " + card + "\n");
+                    output.flush();
 
                 } else {
-                    System.out.println("Invalid card selection.\n");
                     output.print("Invalid card selection.\n");
+                    output.flush();
                 }
             } else {
-                System.out.println("Invalid card index.\n");
-                output.println("Invalid card index.\n");
+                output.print("Invalid card index.\n");
+                output.flush();
             }
         }
 
         // Calculate total attack value based on attackDeck
         attackValue = calculateAttackValue(attack);
-        System.out.println("Your attack value is " + attackValue);
-        output.print("Your attack value is " + attackValue);
-
-//        System.out.println("Press <Enter> to end your turn");
-//        output.println("Press <Enter> to end your turn");
-//        input.nextLine();
-//        output.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-//        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-//        System.out.println("Press <Enter> to start your turn");
-//        output.println("Press <Enter> to start your turn");
-//        input.nextLine();
-//        output.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-//        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        output.print("Your attack value is " + attackValue + "\n");
+        output.flush();
 
         return attackValue;
 
