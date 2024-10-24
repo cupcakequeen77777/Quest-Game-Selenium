@@ -236,6 +236,7 @@ public class Game {
 
 
     public boolean requestSponsorships() {
+        quest = new Quest(eventCard.cardValue);
         for (int i = 0; i < numberPlayers; i++) {
             print("Quest of " + eventCard.cardValue + " stages\n");
             displayHand(playerTurn);
@@ -248,6 +249,7 @@ public class Game {
                     break;
                 } else if (response.equalsIgnoreCase("y")) {
                     players.get(playerTurn).sponsor = true;
+                    quest.sponsor = players.get(playerTurn);
                     return true;
                 }
             }
@@ -350,9 +352,8 @@ public class Game {
         print("Hand: " + players.get(playerIndex).handToString() + "\n");
     }
 
-    public Quest sponsorSetsUpQuest(Player sponsor) {
-        quest = new Quest(eventCard.cardValue);
-        quest.sponsor = sponsor;
+    public void sponsorSetsUpQuest() {
+        Player sponsor = quest.sponsor;
         for (int i = 0; i < quest.numStages; i++) {
             buildStage(sponsor, i);
         }
@@ -369,7 +370,6 @@ public class Game {
 
         nextPlayer();
 
-        return quest;
     }
 
     public Stage buildStage(Player sponsor, int stageIndex) {
@@ -436,6 +436,7 @@ public class Game {
     }
 
     public void participateInQuest() {
+        eligibleParticipants();
         ArrayList<Player> participants = quest.stages.get(quest.currentStage).participants;
         ArrayList<Player> toRemove = new ArrayList<>();
 
@@ -488,6 +489,7 @@ public class Game {
 
         for (int i = 0; i < quest.stages.get(quest.currentStage).participants.size(); i++) {
             Player participant = quest.stages.get(quest.currentStage).participants.get(i);
+            participant.sponsor = false;
 
             // participants with an attack equal or greater to the value of the current stage are eligible for the next stage
             if (participant.attackValue >= quest.stages.get(quest.currentStage).value) {
@@ -500,6 +502,7 @@ public class Game {
             }
             adventureDiscardDeck.addAll(participant.attack);
             participant.attack.removeAll();
+            participant.attackValue = 0;
         }
 
         if (quest.numStages - 1 == quest.currentStage) {
@@ -518,11 +521,16 @@ public class Game {
             }
             eventDiscardDeck.add(eventCard);
             eventCard = null;
+            quest = null;
         } else {
             quest.currentStage++;
             print("Players continuing the quest: " + quest.stages.get(quest.currentStage).participants + "\n");
         }
 
 
+    }
+
+    public Player getPlayer(int playerNumber) {
+        return players.get(playerNumber - 1);
     }
 }

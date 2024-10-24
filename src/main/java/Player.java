@@ -2,6 +2,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Scanner;
 
+
 public class Player {
     int playerNumber;
     Deck hand;
@@ -130,7 +131,7 @@ public class Player {
     }
 
     public String handToString() {
-        hand.sort();
+//        hand.sort(); // REMOVE
         StringBuilder builder = new StringBuilder();
         for (Card card : hand.getDeck()) {
             builder.append(card).append(" ");

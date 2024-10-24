@@ -509,6 +509,8 @@ class MainTest {
         Player sponsor = rigPLayer2Hands();
         sponsor.hand.sort();
         game.eventCard = new Card(4, "Q", Card.CardType.EVENT);
+        game.quest = new Quest(game.eventCard.getValue());
+        game.quest.sponsor=sponsor;
 
         when(mockScanner.nextLine()).
                 thenReturn("0", "6", "quit").
@@ -516,7 +518,7 @@ class MainTest {
                 thenReturn("1", "2", "3", "quit").
                 thenReturn("1", "2", "quit");
 
-        game.sponsorSetsUpQuest(sponsor);
+        game.sponsorSetsUpQuest();
 
         assertEquals("""
                 -------------------
@@ -566,9 +568,10 @@ class MainTest {
         initializeGame(mockScanner, output);
         setInitialHands(game);
         // Create a sponsor, quest, and hand with valid cards
-        Player sponsor = game.players.get(1);
         game.playerTurn = 1;
         game.eventCard = new Card(4, "Q", Card.CardType.EVENT);
+        game.quest = new Quest(game.eventCard.getValue());
+        game.quest.sponsor = game.players.get(0);
 
         // Simulate user input to select the valid cards
         when(mockScanner.nextLine()).
@@ -577,7 +580,7 @@ class MainTest {
                 thenReturn("1", "2", "3", "quit", "").
                 thenReturn("1", "2", "quit", "");
 
-        game.sponsorSetsUpQuest(sponsor);
+        game.sponsorSetsUpQuest();
 
         game.eligibleParticipants();
 
@@ -636,6 +639,7 @@ class MainTest {
 
         Card quest = game.eventDeck.removeCard(new Card(4, "Q", Card.CardType.EVENT));
         game.eventCard = quest;
+        game.quest = new Quest(quest.getValue());
 
         game.displayHand(game.playerTurn);
 
@@ -650,7 +654,7 @@ class MainTest {
                 thenReturn("1", "2", "3", "quit").
                 thenReturn("1", "2", "quit");
 
-        game.sponsorSetsUpQuest(game.players.get(game.playerTurn));
+        game.sponsorSetsUpQuest();
 
         game.eligibleParticipants();
 
@@ -796,14 +800,9 @@ class MainTest {
         when(mockScanner.nextLine()).thenReturn("0");
         game.resolveStage();
 
-        System.out.println(game.adventureDeck.size() + game.adventureDiscardDeck.size() + game.players.get(1).hand.size() + game.players.get(0).hand.size() + game.players.get(2).hand.size() + game.players.get(3).hand.size() + game.players.get(0).attack.size() + game.players.get(1).attack.size() + game.players.get(2).attack.size() + game.players.get(3).attack.size() + game.quest.stages.get(0).weaponCards.size() + game.quest.stages.get(1).weaponCards.size() + game.quest.stages.get(2).weaponCards.size() + game.quest.stages.get(3).weaponCards.size() + 4); // REMOVE
-
         assertEquals(12, game.players.get(1).hand.size());
-        assertTrue(game.quest.stages.get(0).weaponCards.isEmpty());
-        assertNull(game.quest.stages.get(0).foeCard);
+        assertNull(game.quest);
 
-        assertTrue(game.quest.stages.get(1).weaponCards.isEmpty());
-        assertTrue(game.quest.stages.get(2).weaponCards.isEmpty());
 
     }
 
@@ -950,6 +949,7 @@ class MainTest {
 
         // Rig the 4 hands to the hold the cards of the 4 posted initial hands
         rigInitialHands(game);
+
         rigAdventureEventDeck(game);
 
         game.startTurn();
@@ -963,7 +963,7 @@ class MainTest {
                 thenReturn("1", "2", "3", "quit").
                 thenReturn("1", "2", "quit");
 
-        game.sponsorSetsUpQuest(game.players.get(game.playerTurn));
+        game.sponsorSetsUpQuest();
         game.eligibleParticipants();
 
         when(mockScanner.nextLine()).thenReturn("y", "", "y", "", "y", "").thenReturn("0", "", "0", "", "0", "");

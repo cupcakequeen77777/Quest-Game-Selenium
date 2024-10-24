@@ -9,6 +9,16 @@ public class Deck {
         deck = new ArrayList<>(cardLimit);
     }
 
+    public Deck(ArrayList<Card> d) {
+        this.cardLimit = 100;
+        deck = d;
+    }
+
+    public Deck() {
+        this.cardLimit = 100;
+        deck = new ArrayList<>();
+    }
+
     public ArrayList<Card> getDeck() {
         return deck;
     }
@@ -27,7 +37,8 @@ public class Deck {
                 return deck.remove(i);
             }
         }
-        return new Card(1000, "Q", Card.CardType.EVENT);
+        throw new RuntimeException("Couldn't find card " + x + " to remove");
+//        return new Card(1000, "Q", Card.CardType.EVENT);
     }
 
     public Card removeCard(int index) {
@@ -42,7 +53,11 @@ public class Deck {
     }
 
     public void add(Card card) {
-        deck.add(card);
+        if (card != null) {
+            if (card.cardValue != 1000) {
+                deck.add(card);
+            }
+        }
     }
 
     public void addAll(Deck d) {
@@ -68,7 +83,11 @@ public class Deck {
 
     @Override
     public String toString() {
-        return deck.toString();
+        StringBuilder builder = new StringBuilder();
+        for (Card card : getDeck()) {
+            builder.append(card).append(" ");
+        }
+        return builder.toString();
     }
 
     static class CardComparator implements Comparator<Card> {

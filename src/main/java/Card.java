@@ -63,14 +63,33 @@ public class Card {
         return "";
     }
 
+    public int typeValue() {
+        if (cardType.equals(CardType.ADVENTURE)) {
+            return switch (type) {
+                case "F" -> 0;
+                case "D" -> 1;
+                case "S" -> 2;
+                case "H" -> 3;
+                case "B" -> 4;
+                case "L" -> 5;
+                case "E" -> 6;
+                default -> -1;
+            };
+        }
+        return -1;
+    }
+
     // Displaying the hand of a player means listing foes first in increasing order, then weapons, also in increasing order, with swords before horses.
     public int compare(Card card) {
-        if (type.equals("F") && !card.type.equals("F")) {
-            return -1;
-        } else if (card.type.equals("F") && !type.equals("F")) {
-            return 1;
+        if (cardType == CardType.ADVENTURE && card.cardType == CardType.ADVENTURE) {
+            if(typeValue()==0 && card.typeValue()==0){
+                return Integer.compare(cardValue, card.cardValue);
+            }
+            return Integer.compare(typeValue(), card.typeValue());
+        } else if (cardType == CardType.EVENT && card.cardType == CardType.EVENT) {
+            return 0;
         }
-        return Integer.compare(cardValue, card.cardValue);
+        throw new RuntimeException("Cards are of different types");
     }
 
     public boolean equals(Card card) {

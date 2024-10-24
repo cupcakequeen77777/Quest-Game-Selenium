@@ -34,7 +34,7 @@ public class Main {
 
                 if (game.requestSponsorships()) {
 
-                    game.sponsorSetsUpQuest(game.players.get(game.playerTurn));
+                    game.sponsorSetsUpQuest();
 
                     while (true) {
 
