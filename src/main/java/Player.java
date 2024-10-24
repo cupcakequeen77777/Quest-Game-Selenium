@@ -18,6 +18,10 @@ public class Player {
         attack = new Deck(MAX_CARDS);
     }
 
+    public Deck getHand() {
+        return hand;
+    }
+
     public boolean hasWon() {
         return shields >= 7;
     }
@@ -85,7 +89,6 @@ public class Player {
                     attack.add(card);
                     output.print("Selected: " + card + "\n");
                     output.flush();
-
                 } else {
                     output.print("Invalid card selection.\n");
                     output.flush();
@@ -110,7 +113,7 @@ public class Player {
         if (card == null || card.isFoe()) {
             return false;
         }
-        for (Card a : attack.deck) {
+        for (Card a : attack.getDeck()) {
             if (a.equals(card)) {
                 return false;
             }
@@ -129,7 +132,7 @@ public class Player {
     public String handToString() {
         hand.sort();
         StringBuilder builder = new StringBuilder();
-        for (Card card : hand.deck) {
+        for (Card card : hand.getDeck()) {
             builder.append(card).append(" ");
         }
         return builder.toString();

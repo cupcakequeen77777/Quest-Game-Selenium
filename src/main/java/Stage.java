@@ -22,7 +22,7 @@ public class Stage {
                 weaponCards.sort();
             } else {
                 // Handle invalid card type
-                throw new IllegalArgumentException("Invalid card type: " + card.type);
+                throw new IllegalArgumentException("Invalid card type: " + card.type + card.cardValue);
             }
             calculateValue();
         } else {

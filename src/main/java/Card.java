@@ -1,27 +1,30 @@
-
-
 public class Card {
+    public enum CardType {
+        ADVENTURE,
+        EVENT
+    }
+
     int cardValue;
     String type;
-    boolean weapon;
+    CardType cardType;
 
-    public Card(int value, String t, boolean w) {
+    public Card(int value, String t, CardType c) {
         cardValue = value;
         type = t;
-        weapon = w;
+        cardType = c;
     }
 
     public int getValue() {
         return cardValue;
     }
 
-    public String GetType() {
+    public String getType() {
         return type;
     }
 
     @Override
     public String toString() {
-        if (isFoe() || !weapon) {
+        if (cardType.equals(CardType.EVENT))
             if (type.equals("E")) {
                 if (cardValue == 1) {
                     return "Plague";
@@ -30,7 +33,10 @@ public class Card {
                 } else {
                     return "Prosperity";
                 }
+            } else {
+                return type + cardValue;
             }
+        if (isFoe()) {
             return type + cardValue;
         }
         switch (type) {

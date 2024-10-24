@@ -1,8 +1,8 @@
 import java.util.*;
 
 public class Deck {
-    ArrayList<Card> deck;
-    int cardLimit;
+    protected ArrayList<Card> deck;
+    private final int cardLimit;
 
     public Deck(int cardLimit) {
         this.cardLimit = cardLimit;
@@ -27,7 +27,7 @@ public class Deck {
                 return deck.remove(i);
             }
         }
-        return new Card(1000, "Q", true);
+        return new Card(1000, "Q", Card.CardType.EVENT);
     }
 
     public Card removeCard(int index) {
