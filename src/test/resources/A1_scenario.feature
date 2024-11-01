@@ -3,13 +3,14 @@ Feature: A1_scenario
   Scenario: A1_scenario
     Given rig a new game of Adventure starts
 
-    When the cards have been distributed to the players for scenario 1
+    When the cards have been distributed to the players for A1_scenario
     And player 1 hand should be "F5 F5 F15 F15 Dagger Sword Sword Horse Horse Axe Axe Lance "
     And player 2 hand should be "F5 F5 F15 F15 F40 Dagger Sword Horse Horse Axe Axe Excalibur "
     And player 3 hand should be "F5 F5 F5 F15 Dagger Sword Sword Sword Horse Horse Axe Lance "
     And player 4 hand should be "F5 F15 F15 F40 Dagger Dagger Sword Horse Horse Axe Lance Excalibur "
 
-    And P1 draws a quest of 4 stages
+    And P1 starts their turn and draws "Q4"
+    And P1 starts a quest of 4 stages
     And ask players for sponsorship:
       | n |
       | y |

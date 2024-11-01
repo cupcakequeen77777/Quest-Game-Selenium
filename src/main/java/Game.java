@@ -196,6 +196,9 @@ public class Game {
     }
 
     public void resolveEvent(Card newCard) {
+        if(newCard.cardType == Card.CardType.ADVENTURE) {
+            throw new RuntimeException("Drew adventure card!!!!!");
+        }
         Player currentPlayer = players.get(playerTurn);
         Card card;
         switch (newCard.cardValue) {
@@ -212,6 +215,7 @@ public class Game {
                 card = drawAdventureCard();
                 print("Drew: " + card + "\n");
                 currentPlayer.addCard(card);
+                currentPlayer.hand.sort();
                 trimCards();
                 break;
             case 3: // Prosperity: All players draw 2 adventure cards and each of them possibly trims their hand (UC-03)
@@ -224,6 +228,7 @@ public class Game {
                     card = drawAdventureCard();
                     print("Drew: " + card + "\n");
                     player.addCard(card);
+                    player.hand.sort();
                     trimCards();
                     nextPlayer();
                 }
@@ -505,8 +510,12 @@ public class Game {
             participant.attackValue = 0;
         }
 
-        if (quest.numStages - 1 == quest.currentStage) {
-            print("Quest completed by players: " + quest.stages.get(quest.currentStage + 1).participants + "\n");
+         if (quest.numStages - 1 == quest.currentStage) {
+             print("Quest completed by players: " + quest.stages.get(quest.currentStage + 1).participants + "\n");
+         }
+
+        if (quest.numStages - 1 == quest.currentStage || quest.stages.get(quest.currentStage + 1).participants.isEmpty()) {
+//            print("Quest completed by players: " + quest.stages.get(quest.currentStage + 1).participants + "\n");
             // draws the same number of cards + the number of stages, and then possibly trims their hand
             for (int i = 0; i < quest.countCardsUsed() + quest.numStages; i++) {
                 quest.sponsor.addCard(adventureDeck.drawCard());
@@ -522,6 +531,7 @@ public class Game {
             eventDiscardDeck.add(eventCard);
             eventCard = null;
             quest = null;
+            playerTurn = nextPlayer();
         } else {
             quest.currentStage++;
             print("Players continuing the quest: " + quest.stages.get(quest.currentStage).participants + "\n");

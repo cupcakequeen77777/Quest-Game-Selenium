@@ -22,7 +22,6 @@ public class GameSteps {
 
     @Given("rig a new game of Adventure starts")
     public void rig_a_new_game_of_adventure_starts() {
-
         game = new Game(input, new PrintWriter(output));
         game.InitializeAdventureDeck();
         game.InitializeEventDeck();
@@ -34,30 +33,140 @@ public class GameSteps {
         game.players.add(new Player(4));
     }
 
-    @When("P{int} draws a quest of {int} stages")
-    public void pDrawsAQuestOfStages(int playerNumber, int numStages) {
+    @And("P{int} starts their turn and draws {string}:")
+    public void pStartsTheirTurnAndDraws(int playerNumber, String card, List<String> data) {
         assertEquals(playerNumber, game.playerTurn + 1);
+        when(input.nextLine()).thenAnswer(AdditionalAnswers.returnsElementsOf(data));
         game.startTurn();
+        assertEquals(card, game.eventCard.toString());
+    }
+
+    @When("P{int} starts a quest of {int} stages")
+    public void pStartsAQuestOfStages(int playerNumber, int numStages) {
         assertEquals("Q", game.eventCard.getType());
         assertEquals(numStages, game.eventCard.getValue());
     }
 
-    @And("the cards have been distributed to the players for scenario 1")
-    public void the_cards_have_been_distributed_to_the_players_for_scenario_1() {
+    @And("the cards have been distributed to the players for A1_scenario")
+    public void the_cards_have_been_distributed_to_the_players_for_A1_scenario() {
         setInitialHands1(game);
         List<Card> eventCards = List.of(new Card(4, "Q", Card.CardType.EVENT));
-
+        Card.CardType type = Card.CardType.ADVENTURE;
         List<Card> adventureCards = Arrays.asList(
-                new Card(20, "L", Card.CardType.ADVENTURE),
-                new Card(30, "F", Card.CardType.ADVENTURE),
-                new Card(10, "S", Card.CardType.ADVENTURE),
-                new Card(15, "B", Card.CardType.ADVENTURE),
-                new Card(20, "L", Card.CardType.ADVENTURE),
-                new Card(20, "L", Card.CardType.ADVENTURE),
-                new Card(10, "F", Card.CardType.ADVENTURE),
-                new Card(15, "B", Card.CardType.ADVENTURE),
-                new Card(10, "S", Card.CardType.ADVENTURE),
-                new Card(30, "F", Card.CardType.ADVENTURE)
+                new Card(20, "L", type),
+                new Card(30, "F", type),
+                new Card(10, "S", type),
+                new Card(15, "B", type),
+                new Card(20, "L", type),
+                new Card(20, "L", type),
+                new Card(10, "F", type),
+                new Card(15, "B", type),
+                new Card(10, "S", type),
+                new Card(30, "F", type)
+        );
+        rigAdventureEventDeck(eventCards, adventureCards);
+
+    }
+
+    @And("the cards have been distributed to the players for 0_winner_quest")
+    public void the_cards_have_been_distributed_to_the_players_for_0_winner_quest() {
+        setInitialHands1(game);
+        List<Card> eventCards = List.of(new Card(2, "Q", Card.CardType.EVENT));
+        Card.CardType type = Card.CardType.ADVENTURE;
+        List<Card> adventureCards = Arrays.asList(
+                new Card(20, "L", type),
+                new Card(30, "F", type),
+                new Card(10, "S", type),
+                new Card(15, "B", type),
+                new Card(20, "L", type),
+                new Card(20, "L", type),
+                new Card(10, "F", type),
+                new Card(15, "B", type),
+                new Card(10, "S", type),
+                new Card(30, "F", type)
+        );
+        rigAdventureEventDeck(eventCards, adventureCards);
+
+    }
+
+    @And("the cards have been distributed to the players for 1winner_game_with_events")
+    public void the_cards_have_been_distributed_to_the_players_for_1winner_game_with_events() {
+        setInitialHands1(game);
+        List<Card> eventCards = Arrays.asList(
+                new Card(3, "Q", Card.CardType.EVENT),
+                new Card(2, "E", Card.CardType.EVENT),
+                new Card(3, "E", Card.CardType.EVENT),
+                new Card(1, "E", Card.CardType.EVENT),
+                new Card(4, "Q", Card.CardType.EVENT));
+        Card.CardType a = Card.CardType.ADVENTURE;
+        List<Card> adventureCards = Arrays.asList(
+                new Card(70, "F", a),
+
+
+                // 2nd quest: Q3
+                // Stage 3
+                new Card(15, "F", a), // player 3
+                new Card(10, "S", a), // player 2
+                // Stage 2
+                new Card(20, "F", a),  // player 3
+                new Card(10, "H", a),  // player 2
+                // Stage 1
+                new Card(20, "F", a), // player 4
+                new Card(10, "S", a), // player 3
+                new Card(10, "S", a), // player 2
+
+
+                // P4 draws ‘Queen’s favor’
+                new Card(10, "F", a),
+                new Card(10, "F", a),
+
+                // P3 draws Prosperity card
+                // P4 cards drawn
+                new Card(35, "F", a),
+                new Card(35, "F", a),
+
+                // P3 cards drawn
+                new Card(5, "D", a),
+                new Card(10, "H", a),
+                // P2 cards drawn
+                new Card(10, "S", a),
+                new Card(10, "H", a),
+                // P1 cards drawn
+                new Card(20, "F", a),
+                new Card(10, "F", a),
+
+
+                // 1st quest: Q4
+                // Cards P1 (sponsor) draws cards to replace those used in quest + number of stages
+                new Card(50, "F", a),
+                new Card(50, "F", a),
+                new Card(35, "F", a),
+                new Card(30, "F", a),
+                new Card(20, "F", a),
+                new Card(25, "F", a),
+                new Card(25, "F", a),
+                new Card(25, "F", a),
+                new Card(25, "F", a),
+                new Card(10, "F", a),
+                new Card(10, "F", a),
+                new Card(30, "F", a),
+
+                // Stage 4
+                new Card(10, "S", a), // player 4
+                new Card(10, "H", a), // player 3
+                new Card(20, "L", a), // player 2
+                // Stage 3
+                new Card(30, "F", a), // player 4
+                new Card(10, "S", a), // player 3
+                new Card(15, "B", a), // player 2
+                // Stage 2
+                new Card(20, "L", a), // player 4
+                new Card(20, "L", a), // player 3
+                new Card(10, "F", a), // player 2
+                // Stage 1
+                new Card(15, "B", a), // player 4
+                new Card(10, "S", a), // player 3
+                new Card(30, "F", a)  // player 2
         );
         rigAdventureEventDeck(eventCards, adventureCards);
 
@@ -66,6 +175,7 @@ public class GameSteps {
     @Then("player {int} hand should be {string}")
     public void playerHandShouldBe(int playerNumber, String result) {
         System.out.println(game.getPlayer(playerNumber).handToString());
+        System.out.println(game.adventureDeck); // REMOVE
         assertTrue(game.getPlayer(playerNumber).hand.size() < 13);
         assertEquals(result, game.getPlayer(playerNumber).handToString());
     }
@@ -85,37 +195,10 @@ public class GameSteps {
         }
         Collections.reverse(adventureDeck.deck);
 
-    }
+        System.out.println(eventDeck);
+        System.out.println(adventureDeck);
 
-    void rigInitialHands(Game game) {
-        int[] values1 = {5, 5, 15, 15, 5, 10, 10, 10, 10, 15, 15, 20};
-        String[] types1 = {"F", "F", "F", "F", "D", "S", "S", "H", "H", "B", "B", "L"};
-        int[] values2 = {5, 5, 15, 15, 40, 5, 10, 10, 10, 15, 15, 30};
-        String[] types2 = {"F", "F", "F", "F", "F", "D", "S", "H", "H", "B", "B", "E"};
-        int[] values3 = {5, 5, 5, 15, 5, 10, 10, 10, 10, 10, 15, 20};
-        String[] types3 = {"F", "F", "F", "F", "D", "S", "S", "S", "H", "H", "B", "L"};
-        int[] values4 = {5, 15, 15, 40, 5, 5, 10, 10, 10, 15, 20, 30};
-        String[] types4 = {"F", "F", "F", "F", "D", "D", "S", "H", "H", "B", "L", "E"};
 
-        rigHand(game.players.get(0), values1, types1);
-        rigHand(game.players.get(1), values2, types2);
-        rigHand(game.players.get(2), values3, types3);
-        rigHand(game.players.get(3), values4, types4);
-        game.players.get(0).hand.sort();
-        game.players.get(1).hand.sort();
-        game.players.get(2).hand.sort();
-        game.players.get(3).hand.sort();
-    }
-
-    void rigHand(Player p, int[] values, String[] types) {
-
-        for (int i = 0; i < 12; i++) {
-            game.adventureDeck.add(p.hand.drawCard());
-        }
-
-        for (int i = 0; i < 12; i++) {
-            p.addCard(game.adventureDeck.removeCard(new Card(values[i], types[i], Card.CardType.ADVENTURE)));
-        }
     }
 
     void setHand(Player p, int[] values, String[] types) {
@@ -148,10 +231,14 @@ public class GameSteps {
     public void askPlayersForSponsorship(List<String> data) {
         when(input.nextLine()).thenAnswer(AdditionalAnswers.returnsElementsOf(data));
         game.requestSponsorships();
+
     }
 
     @And("ask players to participate {string}:")
     public void askPlayersToParticipate(String players, List<String> data) {
+        System.out.println("Deck"); // REMOVE
+        System.out.println(game.adventureDeck.toString()); // REMOVE
+        System.out.println("Deck"); // REMOVE
         when(input.nextLine()).thenAnswer(AdditionalAnswers.returnsElementsOf(data));
         game.participateInQuest();
         assertEquals(players, game.quest.stages.get(game.quest.currentStage).participants.toString());
@@ -161,6 +248,8 @@ public class GameSteps {
     public void askSponsorForCards(List<String> data) {
         when(input.nextLine()).thenAnswer(AdditionalAnswers.returnsElementsOf(data));
         game.sponsorSetsUpQuest();
+        System.out.println(game.quest);
+
     }
 
 
@@ -205,6 +294,7 @@ public class GameSteps {
     @And("P{int} has {int} cards")
     public void pHasCards(int playerNumber, int numberCards) {
         assertEquals(numberCards, game.players.get(playerNumber - 1).getHand().size());
+        System.out.println(game.adventureDeck);
     }
 
     @And("all adventure cards are accounted for")
@@ -217,4 +307,11 @@ public class GameSteps {
     public void allEventCardsAreAccountedFor() {
         assertEquals(17, game.eventDeck.size() + game.eventDiscardDeck.size());
     }
+
+    @And("quest is complete")
+    public void questIsComplete() {
+        assertNull(game.quest);
+    }
+
+
 }
