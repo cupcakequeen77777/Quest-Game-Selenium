@@ -20,11 +20,9 @@ public class Main {
         game.eventDeck.shuffle();
         game.distributeCards();
 
-        while (!game.checkForWinner()) {
+        while (true) {
 
             Card newCard = game.startTurn();
-
-
             if (newCard.type.equals("Q")) {
 
                 Card quest = newCard;
@@ -56,9 +54,13 @@ public class Main {
                     }
                 }
             }
+            if (game.checkForWinner()) {
+                game.print("End of game!");
+                break;
+            }
 
         }
-        game.print("Winners: " + game.getWinners());
+
     }
 
 

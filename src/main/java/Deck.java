@@ -38,7 +38,6 @@ public class Deck {
             }
         }
         throw new RuntimeException("Couldn't find card " + x + " to remove");
-//        return new Card(1000, "Q", Card.CardType.EVENT);
     }
 
     public Card removeCard(int index) {

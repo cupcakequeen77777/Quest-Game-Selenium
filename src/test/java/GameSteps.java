@@ -314,4 +314,9 @@ public class GameSteps {
     }
 
 
+    @And("Player\\(s) {string} is declared as the winner\\(s)")
+    public void playerSIsDeclaredAsTheWinnerS(String winners) {
+        game.checkForWinner();
+        assertEquals(winners, game.getWinners());
+    }
 }

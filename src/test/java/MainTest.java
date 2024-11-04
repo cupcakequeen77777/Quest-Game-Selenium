@@ -225,7 +225,7 @@ class MainTest {
     @DisplayName("Game displays the id of each winner and then terminates, one winner")
     void RESP_04_test_01() {
         game.players.get(0).shields = 7;
-        assertEquals("End of game!\nWinners!\n1 ", game.getWinners());
+        assertEquals("1 ", game.getWinners());
     }
 
     @Test
@@ -233,7 +233,7 @@ class MainTest {
     void RESP_04_test_02() {
         game.players.get(2).shields = 7;
         game.players.get(3).shields = 7;
-        assertEquals("End of game!\nWinners!\n3 4 ", game.getWinners());
+        assertEquals("3 4 ", game.getWinners());
     }
 
     @Test
@@ -242,7 +242,7 @@ class MainTest {
         game.players.get(3).shields = 7;
         game.players.get(2).shields = 7;
         game.players.get(1).shields = 7;
-        assertEquals("End of game!\nWinners!\n2 3 4 ", game.getWinners());
+        assertEquals("2 3 4 ", game.getWinners());
     }
 
     @Test
@@ -252,7 +252,7 @@ class MainTest {
         game.players.get(1).shields = 7;
         game.players.get(2).shields = 7;
         game.players.get(3).shields = 7;
-        assertEquals("End of game!\nWinners!\n1 2 3 4 ", game.getWinners());
+        assertEquals("1 2 3 4 ", game.getWinners());
     }
 
     @Test
@@ -338,7 +338,7 @@ class MainTest {
         Card quest = game.startTurn();
         game.eventDeck.add(quest);
 
-        quest = game.eventDeck.removeCard(new Card(1, "Q", Card.CardType.EVENT));
+        quest = game.eventDeck.removeCard(new Card(2, "Q", Card.CardType.EVENT));
         game.eventCard = quest;
 
         assertEquals(quest, game.eventCard);

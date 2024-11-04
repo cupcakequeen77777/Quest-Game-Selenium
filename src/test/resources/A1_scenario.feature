@@ -9,7 +9,9 @@ Feature: A1_scenario
     And player 3 hand should be "F5 F5 F5 F15 Dagger Sword Sword Sword Horse Horse Axe Lance "
     And player 4 hand should be "F5 F15 F15 F40 Dagger Dagger Sword Horse Horse Axe Lance Excalibur "
 
-    And P1 starts their turn and draws "Q4"
+    And P1 starts their turn and draws "Q4":
+      |  |
+
     And P1 starts a quest of 4 stages
     And ask players for sponsorship:
       | n |

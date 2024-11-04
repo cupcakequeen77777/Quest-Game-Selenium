@@ -13,7 +13,8 @@ Feature: 0_winner_quest
     And player 4 hand should be "F5 F15 F15 F40 Dagger Dagger Sword Horse Horse Axe Lance Excalibur "
 
     #  • P1 draws a 2 stage quest and decides to sponsor it. P1 builds 2 stages
-    And P1 starts their turn and draws "Q2"
+    And P1 starts their turn and draws "Q2":
+      |  |
     And P1 starts a quest of 2 stages
     And ask players for sponsorship:
       | y |

@@ -131,7 +131,6 @@ public class Player {
     }
 
     public String handToString() {
-//        hand.sort(); // REMOVE
         StringBuilder builder = new StringBuilder();
         for (Card card : hand.getDeck()) {
             builder.append(card).append(" ");

@@ -4,7 +4,7 @@ Feature: 2winner_game_2winner_quest
     Given rig a new game of Adventure starts
 
 #    TODO: change cards
-    When the cards have been distributed to the players for scenario 1
+#    When the cards have been distributed to the players for 2winner_game_2winner_quest
 
     # • P1 draws a 4-stage quest and decides to sponsor it. P1 builds 4 stages, the first of which only has a foe and no weapon.
 

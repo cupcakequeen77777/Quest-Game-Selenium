@@ -18,6 +18,7 @@ public class Game {
     ArrayList<Player> players = new ArrayList<>(numberPlayers);
     Deck adventureDiscardDeck = new Deck(50);
     Deck eventDiscardDeck = new Deck(50);
+    ArrayList<String> winners = new ArrayList<>(numberPlayers);
 
     public Game() {
         input = new Scanner(System.in);
@@ -159,6 +160,7 @@ public class Game {
     public boolean checkForWinner() {
         for (Player player : players) {
             if (player.hasWon()) {
+                print("Winners: " + getWinners());
                 return true;
             }
         }
@@ -176,14 +178,15 @@ public class Game {
     }
 
     public String getWinners() {
-        ArrayList<String> winners = getListOfWinners();
+        winners = getListOfWinners();
         StringBuilder winner = new StringBuilder();
         if (!winners.isEmpty()) {
-            winner.append("End of game!\nWinners!\n");
+            print("End of game!\nWinners!\n");
             for (String s : winners) {
                 winner.append(s).append(" ");
             }
         }
+        print(winner.toString());
         return winner.toString();
     }
 
@@ -196,7 +199,7 @@ public class Game {
     }
 
     public void resolveEvent(Card newCard) {
-        if(newCard.cardType == Card.CardType.ADVENTURE) {
+        if (newCard.cardType == Card.CardType.ADVENTURE) {
             throw new RuntimeException("Drew adventure card!!!!!");
         }
         Player currentPlayer = players.get(playerTurn);
@@ -510,9 +513,9 @@ public class Game {
             participant.attackValue = 0;
         }
 
-         if (quest.numStages - 1 == quest.currentStage) {
-             print("Quest completed by players: " + quest.stages.get(quest.currentStage + 1).participants + "\n");
-         }
+        if (quest.numStages - 1 == quest.currentStage) {
+            print("Quest completed by players: " + quest.stages.get(quest.currentStage + 1).participants + "\n");
+        }
 
         if (quest.numStages - 1 == quest.currentStage || quest.stages.get(quest.currentStage + 1).participants.isEmpty()) {
 //            print("Quest completed by players: " + quest.stages.get(quest.currentStage + 1).participants + "\n");
