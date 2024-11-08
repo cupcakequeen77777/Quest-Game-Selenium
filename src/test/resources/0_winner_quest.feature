@@ -1,7 +1,5 @@
 Feature: 0_winner_quest
 
-#  FIXME: move to A2_Tests.feature
-
   Scenario: 0_winner_quest
     Given rig a new game of Adventure starts
 
