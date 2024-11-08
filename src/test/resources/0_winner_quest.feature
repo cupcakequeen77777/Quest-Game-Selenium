@@ -5,7 +5,6 @@ Feature: 0_winner_quest
   Scenario: 0_winner_quest
     Given rig a new game of Adventure starts
 
-#     QUESTION: do you have to change the cards
     When the cards have been distributed to the players for 0_winner_quest
     And player 1 hand should be "F5 F5 F15 F15 Dagger Sword Sword Horse Horse Axe Axe Lance "
     And player 2 hand should be "F5 F5 F15 F15 F40 Dagger Sword Horse Horse Axe Axe Excalibur "
@@ -38,7 +37,7 @@ Feature: 0_winner_quest
     #   a. P2 is asked and decides to participate – draws an F30 – discards an Excalibur (to trim down to 12 cards)
     #   b. P3 is asked and decides to participate – draws a Sword - discards an Lance (to trim down to 12 cards)
     #   c. P4 is asked and decides to participate – draws an Axe - discards an Excalibur (to trim down to 12 cards)
-    And ask players to participate "[2, 3, 4]":
+    And ask players to participate, participants "[2, 3, 4]":
       | y  |
       |    |
       | y  |
@@ -93,6 +92,9 @@ Feature: 0_winner_quest
     #   All cards used by the sponsor to build the quest are discarded by the game who then draws the same number of cards + the number of stages, and then possibly trims their hand
     #  P1 draws 2 + 10 cards used during quest
     And P1 has 12 cards
+    And P2 has 11 cards
+    And P3 has 11 cards
+    And P4 has 11 cards
 
     And quest is complete
     And all event cards are accounted for

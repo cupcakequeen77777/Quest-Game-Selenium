@@ -29,15 +29,18 @@ Feature: 1winner_game_with_events
       | 0    |
       | 2    |
       | quit |
-      #  Quest
-      #  Stage 1: 5
-      #  F5
-      #  Stage 2: 15
-      #  F5 Sword
-      #  Stage 3: 20
-      #  F15 Dagger
-      #  Stage 4: 25
-      #  F15 Horse
+
+#    Quest
+#    Stage 1: 5
+#    F5
+#    Stage 2: 15
+#    F5 Sword
+#    Stage 3: 20
+#    F15 Dagger
+#    Stage 4: 25
+#    F15 Horse
+
+
 
     #  2. P2, P3 and P4 participate in and win all stages.
 
@@ -45,7 +48,7 @@ Feature: 1winner_game_with_events
     #   P2 is asked and decides to participate – draws an F30 – discards an F5 (to trim down to 12 cards)
     #   P3 is asked and decides to participate – draws a Sword - discards an F5 (to trim down to 12 cards)
     #   P4 is asked and decides to participate – draws an Axe - discards an F5 (to trim down to 12 cards)
-    And ask players to participate "[2, 3, 4]":
+    And ask players to participate, participants "[2, 3, 4]":
       | y |
       |   |
       | y |
@@ -89,7 +92,7 @@ Feature: 1winner_game_with_events
     #    P2 is asked and decides to participate. P2 draws a F10
     #    P3 is asked and decides to participate. P3 draws a Lance
     #    P4 is asked and decides to participate. P4 draws a Lance
-    And ask players to participate "[2, 3, 4]":
+    And ask players to participate, participants "[2, 3, 4]":
       | y |
       |   |
       | y |
@@ -127,7 +130,7 @@ Feature: 1winner_game_with_events
     #   P2 is asked and decides to participate. P2 draws an Axe
     #   P3 is asked and decides to participate. P3 draws a Sword
     #   P4 is asked and decides to participate. P4 draws a F30
-    And ask players to participate "[2, 3, 4]":
+    And ask players to participate, participants "[2, 3, 4]":
       | y |
       |   |
       | y |
@@ -162,7 +165,7 @@ Feature: 1winner_game_with_events
     #   P2 is asked and decides to participate. P2 draws a Lance
     #   P3 is asked and decides to participate. P3 draws a Horse
     #   P4 is asked and decides to participate. P4 draws a Sword
-    And ask players to participate "[2, 3, 4]":
+    And ask players to participate, participants "[2, 3, 4]":
       | y |
       |   |
       | y |
@@ -199,8 +202,8 @@ Feature: 1winner_game_with_events
       | 13 |
       | 12 |
 
-    And P3 attack card(s) is "" and attack value is 0
     And P2 attack card(s) is "" and attack value is 0
+    And P3 attack card(s) is "" and attack value is 0
     And P4 attack card(s) is "" and attack value is 0
     And all adventure cards are accounted for
     And all event cards are accounted for
@@ -273,23 +276,13 @@ Feature: 1winner_game_with_events
       | 3    |
       | quit |
 
-    # Quest
-    # Stage 1: 5
-    # F5
-    # Stage 2: 15
-    # F5 Sword
-    # Stage 3: 20
-    # F15 Dagger
-    # Stage 4: 25
-    # F15 Horse
-
 
     #  8. P2, P3 and P4 participate in stage 1. P2 and P3 win, whereas P4 loses.
     #    Stage 1
     #   P2 is asked and decides to participate. P2 draws a Sword
     #   P3 is asked and decides to participate. P3 draws a Sword
     #   P4 is asked and decides to participate. P4 draws a F20
-    And ask players to participate "[2, 3, 4]":
+    And ask players to participate, participants "[2, 3, 4]":
       | y |
       |   |
       | y |
@@ -332,7 +325,7 @@ Feature: 1winner_game_with_events
     # Stage 2:
     #   P2 is asked and decides to participate. P2 draws a Horse
     #   P3 is asked and decides to participate. P3 draws a F20
-    And ask players to participate "[2, 3]":
+    And ask players to participate, participants "[2, 3]":
       | y |
       |   |
       | y |
@@ -369,7 +362,7 @@ Feature: 1winner_game_with_events
     # Stage 3:
     #   P2 is asked and decides to participate. P2 draws a Sword
     #   P3 is asked and decides to participate. P3 draws a F15
-    And ask players to participate "[2, 3]":
+    And ask players to participate, participants "[2, 3]":
       | y |
       |   |
       | y |

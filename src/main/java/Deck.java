@@ -37,7 +37,7 @@ public class Deck {
                 return deck.remove(i);
             }
         }
-        throw new RuntimeException("Couldn't find card " + x + " to remove");
+        throw new RuntimeException("Couldn't find card " + x.type + x.cardValue + " to remove");
     }
 
     public Card removeCard(int index) {

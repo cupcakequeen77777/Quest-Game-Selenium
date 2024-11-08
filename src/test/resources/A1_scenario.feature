@@ -36,7 +36,7 @@ Feature: A1_scenario
     #   a. P1 is asked and decides to participate – draws an F30 – discards an F5 (to trim down to 12 cards)
     #   b. P3 is asked and decides to participate – draws a Sword - discards an F5 (to trim down to 12 cards)
     #   c. P4 is asked and decides to participate – draws an Axe - discards an F5 (to trim down to 12 cards)
-    And ask players to participate "[1, 3, 4]":
+    And ask players to participate, participants "[1, 3, 4]":
       | y |
       |   |
       | y |
@@ -89,7 +89,7 @@ Feature: A1_scenario
     #    a. P1 is asked and decides to participate. P1 draws a F10
     #    b. P3 is asked and decides to participate. P3 draws a Lance
     #    c. P4 is asked and decides to participate. P4 draws a Lance
-    And ask players to participate "[1, 3, 4]":
+    And ask players to participate, participants "[1, 3, 4]":
       | y |
       |   |
       | y |
@@ -144,7 +144,7 @@ Feature: A1_scenario
     #  Stage 3:
     #   a. P3 is asked and decides to participate. P3 draws an Axe
     #   b. P4 is asked and decides to participate. P4 draws a Sword
-    And ask players to participate "[3, 4]":
+    And ask players to participate, participants "[3, 4]":
       | y |
       |   |
       | y |
@@ -181,7 +181,7 @@ Feature: A1_scenario
     #  Stage 4:
     #      a. P3 is asked and decides to participate. P3 draws a F30
     #      b. P4 is asked and decides to participate. P4 draws a Lance
-    And ask players to participate "[3, 4]":
+    And ask players to participate, participants "[3, 4]":
       | y |
       |   |
       | y |

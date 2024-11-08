@@ -449,7 +449,7 @@ public class Game {
         ArrayList<Player> toRemove = new ArrayList<>();
 
         for (Player player : participants) {
-            if (player.playerNumber != playerTurn - 1) {
+            if (player.playerNumber != quest.sponsor.playerNumber) {
                 print(player.handToString());
                 while (true) {
                     String prompt = "\nPlayer " + player.playerNumber + " do you want to participate in the quest (y/N): ";
