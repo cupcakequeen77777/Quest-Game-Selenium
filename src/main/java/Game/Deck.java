@@ -1,7 +1,9 @@
+package Game;
+
 import java.util.*;
 
 public class Deck {
-    protected ArrayList<Card> deck;
+    public ArrayList<Card> deck;
     private final int cardLimit;
 
     public Deck(int cardLimit) {
@@ -64,7 +66,7 @@ public class Deck {
     }
 
     public Card drawCard() {
-        return deck.removeFirst();
+        return deck.remove(0);
     }
 
     public void shuffle() {

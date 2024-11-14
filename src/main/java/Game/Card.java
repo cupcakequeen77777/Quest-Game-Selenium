@@ -1,3 +1,5 @@
+package Game;
+
 public class Card {
     public enum CardType {
         ADVENTURE,

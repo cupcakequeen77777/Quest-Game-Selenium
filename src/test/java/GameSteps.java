@@ -1,3 +1,7 @@
+import Game.Card;
+import Game.Game;
+import Game.Player;
+import Game.Deck;
 import io.cucumber.java.en.*;
 import org.mockito.AdditionalAnswers;
 
@@ -25,29 +29,29 @@ public class GameSteps {
         game = new Game(input, new PrintWriter(output));
         game.InitializeAdventureDeck();
         game.InitializeEventDeck();
-        game.adventureDeck.shuffle();
-        game.eventDeck.shuffle();
-        game.players.add(new Player(1));
-        game.players.add(new Player(2));
-        game.players.add(new Player(3));
-        game.players.add(new Player(4));
+        game.getAdventureDeck().shuffle();
+        game.getEventDeck().shuffle();
+        game.getPlayers().add(new Player(1));
+        game.getPlayers().add(new Player(2));
+        game.getPlayers().add(new Player(3));
+        game.getPlayers().add(new Player(4));
     }
 
     @And("P{int} starts their turn and draws {string}:")
     public void pStartsTheirTurnAndDraws(int playerNumber, String card, List<String> data) {
-        assertEquals(playerNumber, game.playerTurn + 1);
+        assertEquals(playerNumber, game.getPlayerTurn() + 1);
         when(input.nextLine()).thenAnswer(AdditionalAnswers.returnsElementsOf(data));
         game.startTurn();
-        assertEquals(card, game.eventCard.toString());
+        assertEquals(card, game.getEventCard().toString());
     }
 
     @When("P{int} starts a quest of {int} stages")
     public void pStartsAQuestOfStages(int playerNumber, int numStages) {
-        assertEquals("Q", game.eventCard.getType());
-        assertEquals(numStages, game.eventCard.getValue());
+        assertEquals("Q", game.getEventCard().getType());
+        assertEquals(numStages, game.getEventCard().getValue());
     }
 
-    @And("the cards have been distributed to the players for A1_scenario")
+    @And("the cards have been distributed to the getPlayers() for A1_scenario")
     public void the_cards_have_been_distributed_to_the_players_for_A1_scenario() {
         setInitialHands1(game);
         List<Card> eventCards = List.of(new Card(4, "Q", Card.CardType.EVENT));
@@ -68,7 +72,7 @@ public class GameSteps {
 
     }
 
-    @And("the cards have been distributed to the players for 0_winner_quest")
+    @And("the cards have been distributed to the getPlayers() for 0_winner_quest")
     public void the_cards_have_been_distributed_to_the_players_for_0_winner_quest() {
         setInitialHands1(game);
         List<Card> eventCards = List.of(new Card(2, "Q", Card.CardType.EVENT));
@@ -89,7 +93,7 @@ public class GameSteps {
 
     }
 
-    @And("the cards have been distributed to the players for 1winner_game_with_events")
+    @And("the cards have been distributed to the getPlayers() for 1winner_game_with_events")
     public void the_cards_have_been_distributed_to_the_players_for_1winner_game_with_events() {
         setInitialHands1(game);
         List<Card> eventCards = Arrays.asList(
@@ -104,13 +108,13 @@ public class GameSteps {
 
 
                 // 2nd quest: Q3
-                // Stage 3
+                // Game.Stage 3
                 new Card(15, "F", a), // player 3
                 new Card(10, "S", a), // player 2
-                // Stage 2
+                // Game.Stage 2
                 new Card(20, "F", a),  // player 3
                 new Card(10, "H", a),  // player 2
-                // Stage 1
+                // Game.Stage 1
                 new Card(20, "F", a), // player 4
                 new Card(10, "S", a), // player 3
                 new Card(10, "S", a), // player 2
@@ -151,19 +155,19 @@ public class GameSteps {
                 new Card(10, "F", a),
                 new Card(30, "F", a),
 
-                // Stage 4
+                // Game.Stage 4
                 new Card(10, "S", a), // player 4
                 new Card(10, "H", a), // player 3
                 new Card(20, "L", a), // player 2
-                // Stage 3
+                // Game.Stage 3
                 new Card(30, "F", a), // player 4
                 new Card(10, "S", a), // player 3
                 new Card(15, "B", a), // player 2
-                // Stage 2
+                // Game.Stage 2
                 new Card(20, "L", a), // player 4
                 new Card(20, "L", a), // player 3
                 new Card(10, "F", a), // player 2
-                // Stage 1
+                // Game.Stage 1
                 new Card(15, "B", a), // player 4
                 new Card(10, "S", a), // player 3
                 new Card(30, "F", a)  // player 2
@@ -172,7 +176,7 @@ public class GameSteps {
 
     }
 
-    @When("the cards have been distributed to the players for 2winner_game_2winner_quest")
+    @When("the cards have been distributed to the getPlayers() for 2winner_game_2winner_quest")
     public void the_cards_have_been_distributed_to_the_players_for_2winner_game_2winner_quest() {
         setInitialHands2(game);
         List<Card> eventCards = Arrays.asList(
@@ -184,13 +188,13 @@ public class GameSteps {
                 new Card(50, "F", a),
 
                 // 2nd quest: Q3
-                // Stage 3
+                // Game.Stage 3
                 new Card(10, "S", a), // player 4
                 new Card(20, "L", a), // player 2
-                // Stage 2
+                // Game.Stage 2
                 new Card(5, "F", a),  // player 4
                 new Card(10, "S", a),  // player 2
-                // Stage 1
+                // Game.Stage 1
                 new Card(15, "B", a), // player 4
                 new Card(10, "S", a), // player 2
 
@@ -209,16 +213,16 @@ public class GameSteps {
                 new Card(15, "F", a),
                 new Card(10, "S", a),
 
-                // Stage 4
+                // Game.Stage 4
                 new Card(10, "H", a), // player 4
                 new Card(15, "B", a), // player 2
-                // Stage 3
+                // Game.Stage 3
                 new Card(10, "S", a), // player 4
                 new Card(15, "F", a), // player 2
-                // Stage 2
+                // Game.Stage 2
                 new Card(15, "F", a), // player 4
                 new Card(5, "F", a), // player 2
-                // Stage 1
+                // Game.Stage 1
                 new Card(35, "F", a), // player 4
                 new Card(5, "D", a), // player 3
                 new Card(30, "F", a)  // player 2
@@ -229,14 +233,14 @@ public class GameSteps {
 
     @Then("player {int} hand should be {string}")
     public void playerHandShouldBe(int playerNumber, String result) {
-        assertTrue(game.getPlayer(playerNumber).hand.size() < 13);
+        assertTrue(game.getPlayer(playerNumber).getHand().size() < 13);
         assertEquals(result, game.getPlayer(playerNumber).handToString());
     }
 
 
     private void rigAdventureEventDeck(List<Card> eventCards, List<Card> adventureCards) {
-        Deck adventureDeck = game.adventureDeck;
-        Deck eventDeck = game.eventDeck;
+        Deck adventureDeck = game.getAdventureDeck();
+        Deck eventDeck = game.getEventDeck();
 
         for (Card card : eventCards) {
             eventDeck.add(eventDeck.removeCard(card));
@@ -256,7 +260,7 @@ public class GameSteps {
 
     void setHand(Player p, int[] values, String[] types) {
         for (int i = 0; i < 12; i++) {
-            p.addCard(game.adventureDeck.removeCard(new Card(values[i], types[i], Card.CardType.ADVENTURE)));
+            p.addCard(game.getAdventureDeck().removeCard(new Card(values[i], types[i], Card.CardType.ADVENTURE)));
         }
     }
 
@@ -270,14 +274,14 @@ public class GameSteps {
         int[] values4 = {5, 15, 15, 40, 5, 5, 10, 10, 10, 15, 20, 30};
         String[] types4 = {"F", "F", "F", "F", "D", "D", "S", "H", "H", "B", "L", "E"};
 
-        setHand(game.players.get(0), values1, types1);
-        setHand(game.players.get(1), values2, types2);
-        setHand(game.players.get(2), values3, types3);
-        setHand(game.players.get(3), values4, types4);
-        game.players.get(0).hand.sort();
-        game.players.get(1).hand.sort();
-        game.players.get(2).hand.sort();
-        game.players.get(3).hand.sort();
+        setHand(game.getPlayers().get(0), values1, types1);
+        setHand(game.getPlayers().get(1), values2, types2);
+        setHand(game.getPlayers().get(2), values3, types3);
+        setHand(game.getPlayers().get(3), values4, types4);
+        game.getPlayers().get(0).getHand().sort();
+        game.getPlayers().get(1).getHand().sort();
+        game.getPlayers().get(2).getHand().sort();
+        game.getPlayers().get(3).getHand().sort();
     }
 
     void setInitialHands2(Game game) {
@@ -290,45 +294,45 @@ public class GameSteps {
         int[] values4 = {10, 25, 5, 5, 10, 10, 10, 15, 20, 20, 20, 30};
         String[] types4 = {"F", "F", "D", "D", "H", "H", "S", "B", "L", "L", "L", "E"};
 
-        setHand(game.players.get(0), values1, types1);
-        setHand(game.players.get(1), values2, types2);
-        setHand(game.players.get(2), values3, types3);
-        setHand(game.players.get(3), values4, types4);
-        game.players.get(0).hand.sort();
-        game.players.get(1).hand.sort();
-        game.players.get(2).hand.sort();
-        game.players.get(3).hand.sort();
+        setHand(game.getPlayers().get(0), values1, types1);
+        setHand(game.getPlayers().get(1), values2, types2);
+        setHand(game.getPlayers().get(2), values3, types3);
+        setHand(game.getPlayers().get(3), values4, types4);
+        game.getPlayers().get(0).getHand().sort();
+        game.getPlayers().get(1).getHand().sort();
+        game.getPlayers().get(2).getHand().sort();
+        game.getPlayers().get(3).getHand().sort();
     }
 
-    @And("ask players for sponsorship:")
+    @And("ask getPlayers() for sponsorship:")
     public void askPlayersForSponsorship(List<String> data) {
         when(input.nextLine()).thenAnswer(AdditionalAnswers.returnsElementsOf(data));
         game.requestSponsorships();
 
     }
 
-    @And("ask players to participate, participants {string}:")
+    @And("ask getPlayers() to participate, participants {string}:")
     public void askPlayersToParticipate(String players, List<String> data) {
         when(input.nextLine()).thenAnswer(AdditionalAnswers.returnsElementsOf(data));
         game.participateInQuest();
-        assertEquals(players, game.quest.stages.get(game.quest.currentStage).participants.toString());
+        assertEquals(players, game.getQuest().stages.get(game.getQuest().currentStage).participants.toString());
     }
 
     @And("ask sponsor for cards:")
     public void askSponsorForCards(List<String> data) {
         when(input.nextLine()).thenAnswer(AdditionalAnswers.returnsElementsOf(data));
         game.sponsorSetsUpQuest();
-        System.out.println(game.quest);
+        System.out.println(game.getQuest());
 
     }
 
 
     @And("quest sponsor is P{int}")
     public void questSponsorIsP(int playerNumber) {
-        assertEquals(playerNumber, game.quest.sponsor.playerNumber);
+        assertEquals(playerNumber, game.getQuest().sponsor.playerNumber);
     }
 
-    @And("players attack with card selected:")
+    @And("getPlayers() attack with card selected:")
     public void playersAttack(List<String> data) {
         when(input.nextLine()).thenAnswer(AdditionalAnswers.returnsElementsOf(data));
         game.handleParticipantAttacks();
@@ -338,8 +342,8 @@ public class GameSteps {
 
     @And("P{int} attack card\\(s) is {string} and attack value is {int}")
     public void pAttackCardsIsAndAttackValueIs(int playerNumber, String attackCards, int pAttack) {
-        assertEquals(attackCards, game.players.get(playerNumber - 1).attack.toString());
-        assertEquals(pAttack, game.players.get(playerNumber - 1).attackValue);
+        assertEquals(attackCards, game.getPlayers().get(playerNumber - 1).attack.toString());
+        assertEquals(pAttack, game.getPlayers().get(playerNumber - 1).attackValue);
     }
 
 
@@ -352,38 +356,38 @@ public class GameSteps {
 
     @And("participant\\(s) eligible for next stage {string}")
     public void participantSEligibleForNextStage(String participants) {
-        assertEquals(participants, game.quest.stages.get(game.quest.currentStage).participants.toString());
+        assertEquals(participants, game.getQuest().stages.get(game.getQuest().currentStage).participants.toString());
     }
 
     @And("P{int} has {int} shield\\(s)")
     public void pHasShieldS(int playerNumber, int shields) {
-        assertEquals(shields, game.players.get(playerNumber - 1).shields);
+        assertEquals(shields, game.getPlayers().get(playerNumber - 1).shields);
     }
 
     @And("P{int} has {int} cards")
     public void pHasCards(int playerNumber, int numberCards) {
-        assertEquals(numberCards, game.players.get(playerNumber - 1).getHand().size());
-        System.out.println(game.adventureDeck);
+        assertEquals(numberCards, game.getPlayers().get(playerNumber - 1).getHand().size());
+        System.out.println(game.getAdventureDeck());
     }
 
     @And("all adventure cards are accounted for")
     public void allAdventureCardsAreAccountedFor() {
-        int count = game.adventureDeck.size() + game.adventureDiscardDeck.size() + game.players.get(0).hand.size() + game.players.get(1).hand.size() + game.players.get(2).hand.size() + game.players.get(3).hand.size();
+        int count = game.getAdventureDeck().size() + game.adventureDiscardDeck.size() + game.getPlayers().get(0).getHand().size() + game.getPlayers().get(1).getHand().size() + game.getPlayers().get(2).getHand().size() + game.getPlayers().get(3).getHand().size();
         assertEquals(100, count);
     }
 
     @And("all event cards are accounted for")
     public void allEventCardsAreAccountedFor() {
-        assertEquals(17, game.eventDeck.size() + game.eventDiscardDeck.size());
+        assertEquals(17, game.getEventDeck().size() + game.eventDiscardDeck.size());
     }
 
     @And("quest is complete")
     public void questIsComplete() {
-        assertNull(game.quest);
+        assertNull(game.getQuest());
     }
 
 
-    @And("Player\\(s) {string} is declared as the winner\\(s)")
+    @And("Game.Player\\(s) {string} is declared as the winner\\(s)")
     public void playerSIsDeclaredAsTheWinnerS(String winners) {
         game.checkForWinner();
         assertEquals(winners, game.getWinners());

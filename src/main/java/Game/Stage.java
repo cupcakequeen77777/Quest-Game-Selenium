@@ -1,10 +1,12 @@
+package Game;
+
 import java.util.ArrayList;
 
 public class Stage {
     Card foeCard;
     Deck weaponCards;
     int value;
-    ArrayList<Player> participants;
+    public ArrayList<Player> participants;
 
     public Stage() {
         foeCard = null;

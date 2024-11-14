@@ -1,16 +1,18 @@
+package Game;
+
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Scanner;
 
 
 public class Player {
-    int playerNumber;
+    public int playerNumber;
     Deck hand;
     final int MAX_CARDS = 12;
-    int shields;
+    public int shields;
     boolean sponsor = false;
-    Deck attack;
-    int attackValue;
+    public Deck attack;
+    public int attackValue;
 
     public Player(int playerNumber) {
         this.playerNumber = playerNumber;
@@ -62,7 +64,7 @@ public class Player {
     }
 
     public int setupAttack(Scanner input, PrintWriter output) {
-        output.print("Player " + playerNumber + " set up your attack.\n");
+        output.print("Game.Player " + playerNumber + " set up your attack.\n");
         output.flush();
 
         while (true) {
@@ -79,7 +81,7 @@ public class Player {
             int cardIndex;
             try {
                 cardIndex = Integer.parseInt(userInput);
-            } catch (NumberFormatException _) {
+            } catch (NumberFormatException a) {
                 continue;
             }
 

@@ -1,12 +1,14 @@
+package Game;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Quest {
-    List<Stage> stages;
+    public List<Stage> stages;
     int numStages;
     boolean isCompleted;
-    int currentStage;
-    Player sponsor;
+    public int currentStage;
+    public Player sponsor;
 
     public Quest(int numStages) {
         this.numStages = numStages;
@@ -45,11 +47,11 @@ public class Quest {
     public String toString() {
         StringBuilder str = new StringBuilder();
         str.append("-------------------\n");
-        str.append("Quest\n");
+        str.append("Game.Quest\n");
 
         int counter = 1;
         for (Stage stage : stages) {
-            str.append("Stage ").append(counter).append(": ").append(stage).append("\n");
+            str.append("Game.Stage ").append(counter).append(": ").append(stage).append("\n");
             counter++;
         }
         str.append("-------------------\n");
