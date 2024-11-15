@@ -22,23 +22,16 @@ public class GameController {
 
     @GetMapping("/start")
     public String startGame() {
-//        resetGame();
-//        player.addCard(deck.drawCard());
-//        player.addCard(deck.drawCard());
-//        dealer.addCard(deck.drawCard());
-//        dealer.addCard(deck.drawCard());
-//        return "Game started. Player score: " + player.getScore();
         game.distributeCards();
-
         return (game.playerTurn + 1) + "";
     }
 
-//   @PostMapping("/get-current-player")
-//    public String get_current_player() {
-//        return (game.playerTurn + 1) + "";
-//    }
+   @GetMapping("/get-current-player")
+    public String get_current_player() {
+        return (game.playerTurn + 1) + "";
+    }
 
-    @PostMapping("/get-current-hand")
+    @GetMapping("/get-current-hand")
     public String get_current_hand() {
         return game.players.get(game.playerTurn).hand.toString();
     }
