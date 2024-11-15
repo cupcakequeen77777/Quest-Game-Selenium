@@ -25,7 +25,18 @@ public class Game {
     public Game() {
         input = new Scanner(System.in);
         output = new PrintWriter(System.out, true);
+        players.add(new Player(1));
+        players.add(new Player(2));
+        players.add(new Player(3));
+        players.add(new Player(4));
+
+        // Start game, decks are created, hands of the 4 players are set up with random cards
+        InitializeAdventureDeck();
+        InitializeEventDeck();
+        adventureDeck.shuffle();
+        eventDeck.shuffle();
     }
+
 
     public Game(Scanner in, PrintWriter out) {
         input = in;

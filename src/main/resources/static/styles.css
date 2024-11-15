@@ -23,12 +23,12 @@ body {
 h1 {
     font-size: 2.5em;
     margin-bottom: 20px;
-    color: #ffcc00;
+    color: #fa5581;
     text-shadow: 2px 2px #000;
 }
 
 button {
-    background-color: #ffcc00;
+    background-color: #fa5581;
     color: #1a1a2e;
     font-size: 1.2em;
     padding: 12px 24px;
@@ -57,5 +57,16 @@ button:active {
     border-radius: 10px;
     text-align: center;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-    color: #ffcc00;
+    color: #fa5581;
+}
+
+div {
+    font-size: 1.2em;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #333;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    color: #fa5581;
 }

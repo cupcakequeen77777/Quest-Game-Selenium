@@ -13,8 +13,10 @@ public class GameController {
 //    private Deck deck;
 //    private Player player;
 //    private Player dealer;
+    Game game;
 
     public GameController() {
+        game = new Game();
 //        resetGame();
     }
 
@@ -26,8 +28,30 @@ public class GameController {
 //        dealer.addCard(deck.drawCard());
 //        dealer.addCard(deck.drawCard());
 //        return "Game started. Player score: " + player.getScore();
-        System.out.println("Starting Game");
-        return "Game started";
+        game.distributeCards();
+
+        return (game.playerTurn + 1) + "";
+    }
+
+//   @PostMapping("/get-current-player")
+//    public String get_current_player() {
+//        return (game.playerTurn + 1) + "";
+//    }
+
+    @PostMapping("/get-current-hand")
+    public String get_current_hand() {
+        return game.players.get(game.playerTurn).hand.toString();
+    }
+
+    @PostMapping("/start-turn")
+    public String start_turn() {
+        return game.players.get(game.playerTurn).hand.toString();
+    }
+
+    @PostMapping("/play_turn")
+    public String play_turn() {
+
+        return game.players.get(game.playerTurn).hand.toString();
     }
 
 //    @PostMapping("/hit")

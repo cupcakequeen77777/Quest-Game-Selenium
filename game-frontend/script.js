@@ -11,12 +11,12 @@ async function startGame() {
     }
 }
 
-async function hit() {
+async function start_turn() {
     try {
-        const response = await fetch(`${apiBaseUrl}/hit`, { method: "POST" });
+        const response = await fetch(`${apiBaseUrl}/start_turn`, { method: "POST" });
         const result = await response.text();
-        console.log("Hit Response:", result);
-        document.getElementById("game-status").innerText = result;
+        console.log("start_turn Response:", result);
+        // document.getElementById("game-status").innerText = result;
     } catch (error) {
         console.error("Error in hit:", error);
     }
