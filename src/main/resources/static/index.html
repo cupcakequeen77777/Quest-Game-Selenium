@@ -1,28 +1,19 @@
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>You first Spring application</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack Game</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<form action="/add" method="POST">
-    <p>Let's add a customer.</p>
-
-    <div>
-        <label for="firstName">First name:</label>
-        <input name="first" id="firstName" value="Homer">
-    </div>
-    <div>
-        <label for="lastName">Last name:</label>
-        <input name="last" id="lastName" value="Simpson">
-    </div>
-    <div>
-        <button>Add customer</button>
-    </div>
-</form>
-
-<form action="/list" method="GET">
-    <button>List customers</button>
-</form>
+<div class="container">
+    <h1>Welcome to Blackjack</h1>
+    <button onclick="startGame()">Start Game</button>
+<!--    <button onclick="hit()">Hit</button>-->
+<!--    <button onclick="stand()">Stand</button>-->
+    <div id="game-status"></div>
+</div>
+<script src="script.js"></script>
 </body>
 </html>
