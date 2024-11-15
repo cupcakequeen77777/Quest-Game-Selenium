@@ -1,8 +1,14 @@
 package Game;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.annotations.Expose;
+
 import java.util.*;
 
 public class Deck {
+    @Expose
     public ArrayList<Card> deck;
     private final int cardLimit;
 
@@ -84,6 +90,14 @@ public class Deck {
 
     @Override
     public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (Card card : getDeck()) {
+            builder.append(card).append(" ");
+        }
+        return builder.toString();
+    }
+
+    public String toJson() {
         StringBuilder builder = new StringBuilder();
         for (Card card : getDeck()) {
             builder.append(card).append(" ");

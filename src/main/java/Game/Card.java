@@ -84,7 +84,7 @@ public class Card {
     // Displaying the hand of a player means listing foes first in increasing order, then weapons, also in increasing order, with swords before horses.
     public int compare(Card card) {
         if (cardType == CardType.ADVENTURE && card.cardType == CardType.ADVENTURE) {
-            if(typeValue()==0 && card.typeValue()==0){
+            if (typeValue() == 0 && card.typeValue() == 0) {
                 return Integer.compare(cardValue, card.cardValue);
             }
             return Integer.compare(typeValue(), card.typeValue());

@@ -1,5 +1,10 @@
 package Game;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.annotations.Expose;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -8,18 +13,28 @@ import java.util.Scanner;
 public class Game {
 
     final int numberTypesOfFoes = 10;
+    @Expose
     final int numberPlayers = 4;
+    @Expose
     int playerTurn = 0;
+    @Expose
     Card eventCard = null;
+    @Expose
     Quest quest = null;
     public PrintWriter output;
     public Scanner input;
 
+    @Expose
     Deck adventureDeck = new Deck(50);
+    @Expose
     Deck eventDeck = new Deck(50);
+    @Expose
     ArrayList<Player> players = new ArrayList<>(numberPlayers);
+    @Expose
     public Deck adventureDiscardDeck = new Deck(50);
+    @Expose
     public Deck eventDiscardDeck = new Deck(50);
+    @Expose
     ArrayList<String> winners = new ArrayList<>(numberPlayers);
 
     public Game() {
@@ -582,5 +597,34 @@ public class Game {
 
     public Player getPlayer(int playerNumber) {
         return players.get(playerNumber - 1);
+    }
+
+    public String toGson() {
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .setPrettyPrinting()
+                .create();
+        String jsonString = gson.toJson(this);
+
+        JsonObject jsonObject = gson.fromJson(jsonString, JsonObject.class);
+        jsonObject.addProperty("adventureDeck", adventureDeck.toJson());
+        jsonObject.addProperty("eventDeck", eventDeck.toJson());
+        jsonObject.addProperty("adventureDiscardDeck", adventureDiscardDeck.toJson());
+        jsonObject.addProperty("eventDiscardDeck", eventDiscardDeck.toJson());
+        jsonObject.addProperty("players", toJson(players));
+
+        return gson.toJson(jsonObject);
+    }
+
+    private String toJson(ArrayList<Player> players) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (Player player : players) {
+            sb.append(player.toJson()).append(",");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("]");
+
+        return sb.toString();
     }
 }

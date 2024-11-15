@@ -1,18 +1,18 @@
 package Game;
 
+import com.google.gson.Gson;
+import io.cucumber.messages.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
+
 @RestController
 @CrossOrigin(origins = "http://127.0.0.1:8080")
-//@CrossOrigin(origins = "http://127.0.0.1:8081")
 public class GameController {
 
-//    private Deck deck;
-//    private Player player;
-//    private Player dealer;
     Game game;
 
     public GameController() {
@@ -21,24 +21,15 @@ public class GameController {
     }
 
     @GetMapping("/start")
-    public String startGame() {
+    public void startGame() {
         game.distributeCards();
-        return (game.playerTurn + 1) + "";
     }
 
-   @GetMapping("/get-current-player")
-    public String get_current_player() {
-        return (game.playerTurn + 1) + "";
-    }
 
-    @GetMapping("/get-current-hand")
-    public String get_current_hand() {
-        return game.players.get(game.playerTurn).hand.toString();
-    }
 
-    @PostMapping("/start-turn")
-    public String start_turn() {
-        return game.players.get(game.playerTurn).hand.toString();
+    @GetMapping("/get-game-state")
+    public String get_game_state() {
+        return game.toGson();
     }
 
     @PostMapping("/play_turn")
@@ -47,14 +38,14 @@ public class GameController {
         return game.players.get(game.playerTurn).hand.toString();
     }
 
-//    @PostMapping("/hit")
-//    public String hit() {
-//        player.addCard(deck.drawCard());
-//        if (player.getScore() > 21) {
-//            return "Bust! Player score: " + player.getScore();
-//        }
-//        return "Player hits. Current score: " + player.getScore();
-//    }
+    @PostMapping("/draw_card")
+    public String draw_card() {
+        player.addCard(deck.drawCard());
+        if (player.getScore() > 21) {
+            return "Bust! Player score: " + player.getScore();
+        }
+        return ""; // Card that was drawn
+    }
 //
 //    @PostMapping("/stand")
 //    public String stand() {

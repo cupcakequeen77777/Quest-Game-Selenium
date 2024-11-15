@@ -1,5 +1,8 @@
 package Game;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -61,6 +64,10 @@ public class Player {
 
     public String toString() {
         return playerNumber + "";
+    }
+
+    public String toJson() {
+        return "{\"playerNumber\":" + playerNumber + ",\"shields\":" + shields + ",\"hand\":\"" + hand.toJson() + "\"}";
     }
 
     public int setupAttack(Scanner input, PrintWriter output) {
