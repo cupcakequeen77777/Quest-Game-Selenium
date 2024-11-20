@@ -85,4 +85,18 @@ public class Stage {
         }
         return str.toString();
     }
+
+    public String toJson() {
+        StringBuilder str = new StringBuilder();
+        str.append("{\n");
+        str.append("\"value\": ").append(value).append(",\n");
+        str.append("\"foeCard\": ").append(foeCard).append(",\n");
+        str.append("\"weaponCards\": ");
+        for (int i = 0; i < weaponCards.getDeck().size(); i++) {
+            str.append(weaponCards.toJson());
+        }
+        str.append("\n");
+        str.append("}");
+        return str.toString();
+    }
 }

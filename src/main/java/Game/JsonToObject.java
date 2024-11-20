@@ -7,6 +7,7 @@ public class JsonToObject {
     public static void main(String[] args) {
         // Creating object of Organisation
         Game game = new Game();
+        game.eventCard = new Card(10, "D", Card.CardType.ADVENTURE);
 
         System.out.println(game.toGson());
 

@@ -86,7 +86,7 @@ async function start_turn() {
 async function draw_card() {
     document.getElementById("draw_card_button").style.display = '';
     try {
-        const response = await fetch(`${apiBaseUrl}/draw_card`, {method: "POST"});
+        const response = await fetch(`${apiBaseUrl}/draw_event_card`, {method: "POST"});
         const result = await response.text();
 
         console.log("draw_card Response:", result);

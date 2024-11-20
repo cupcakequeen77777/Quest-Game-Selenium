@@ -1,13 +1,9 @@
 package Game;
 
-import com.google.gson.Gson;
-import io.cucumber.messages.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.File;
 
 @RestController
 @CrossOrigin(origins = "http://127.0.0.1:8080")
@@ -20,12 +16,10 @@ public class GameController {
 //        resetGame();
     }
 
-    @GetMapping("/start")
+    @PostMapping("/start")
     public void startGame() {
         game.distributeCards();
     }
-
-
 
     @GetMapping("/get-game-state")
     public String get_game_state() {
@@ -38,13 +32,13 @@ public class GameController {
         return game.players.get(game.playerTurn).hand.toString();
     }
 
-    @PostMapping("/draw_card")
-    public String draw_card() {
-        player.addCard(deck.drawCard());
-        if (player.getScore() > 21) {
-            return "Bust! Player score: " + player.getScore();
-        }
-        return ""; // Card that was drawn
+    @PostMapping("/draw_event_card")
+    public String draw_event_card() {
+
+        Card newCard = game.drawEventCard();
+        game.eventCard = newCard;
+
+        return newCard.toString(); // Card that was drawn
     }
 //
 //    @PostMapping("/stand")

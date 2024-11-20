@@ -602,6 +602,7 @@ public class Game {
     public String toGson() {
         Gson gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
+                .serializeNulls()
                 .setPrettyPrinting()
                 .create();
         String jsonString = gson.toJson(this);
@@ -612,7 +613,13 @@ public class Game {
         jsonObject.addProperty("adventureDiscardDeck", adventureDiscardDeck.toJson());
         jsonObject.addProperty("eventDiscardDeck", eventDiscardDeck.toJson());
         jsonObject.addProperty("players", toJson(players));
-
+        if(eventCard != null) {
+            jsonObject.addProperty("eventCard", eventCard.toString());
+        }
+        // TODO: Implement toJson for Quest
+        if (quest != null) {
+            jsonObject.addProperty("quest", quest.toJson());
+        }
         return gson.toJson(jsonObject);
     }
 

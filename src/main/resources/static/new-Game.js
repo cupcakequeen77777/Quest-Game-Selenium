@@ -1,16 +1,5 @@
 const apiBaseUrl = "http://localhost:8080";
 
-async function startGame() {
-    await fetch(`${apiBaseUrl}/start`);
-    await getGameState()
-    location.pathname = "start-turn.html";
-}
-
-async function startTurn() {
-    await getGameState()
-    location.pathname = "play-turn.html";
-}
-
 async function getGameState() {
     try {
         let response = await fetch(`${apiBaseUrl}/get-game-state`);
@@ -24,30 +13,65 @@ async function getGameState() {
 
 }
 
+function AccessGameState() {
+    let game_state = localStorage.getItem("game-state");
+    game_state = JSON.parse(game_state);
+    game_state["players"] = JSON.parse(game_state["players"]);
+    return game_state
+}
+
+async function startGame() {
+    try {
+        const response = await fetch(`${apiBaseUrl}/start`, {method: "POST"});
+        const result = await response.text();
+        console.log("start Response:", result);
+
+    } catch (error) {
+        console.error("Error in startGame:", error);
+    }
+    await getGameState()
+    location.pathname = "start-turn.html";
+}
+
+async function startTurn() {
+    await getGameState()
+    location.pathname = "play-turn.html";
+}
+
+
 if (location.pathname === "/") {
     // Add event listener to the Start Game button
     document.getElementById("start_turn_button").addEventListener("click", startGame);
 }
 
-async function draw_card() {
-    document.getElementById("draw_card_button").style.display = '';
+// QUESTION: can we use REACT?
+async function draw_event_card() {
+    // document.getElementById("draw_card_button").hidden = true
+    // document.getElementById("card_drawn").innerText === "Changed"
+    document.getElementById("draw_card_button").style.display = "none";
+
     try {
-        const response = await fetch(`${apiBaseUrl}/draw_card`, {method: "POST"});
+        const response = await fetch(`${apiBaseUrl}/draw_event_card`, {method: "POST"});
         const result = await response.text();
-        console.log("draw_card Response:", result);
+        console.log("draw_event_card Response:", result);
+        await getGameState()
+        let game_state = Object(AccessGameState())
+        console.log("Here")
+        console.log(game_state)
+        document.getElementById("card_drawn").innerText = game_state["eventCard"]
+
     } catch (error) {
-        console.error("Error in start_turn:", error);
+        console.error("Error in draw_event_card:", error);
     }
+
 }
 
-function AccessGameState() {
-    let game_state = localStorage.getItem("game-state");
-    game_state = JSON.parse(game_state);
-    game_state["players"] = JSON.parse(game_state["players"]);
-    console.log(game_state)
-    console.log(game_state["players"])
+function updateShields(game_state) {
+    document.getElementById("player1-score").innerText = game_state["players"][0]["shields"]
+    document.getElementById("player2-score").innerText = game_state["players"][1]["shields"]
+    document.getElementById("player3-score").innerText = game_state["players"][2]["shields"]
+    document.getElementById("player4-score").innerText = game_state["players"][3]["shields"]
 
-    return game_state
 }
 
 
@@ -56,8 +80,7 @@ window.onload = function () {
     let game_state = Object(AccessGameState())
     const currentPlayer = game_state["playerTurn"]
     const currentPlayerHand = game_state["players"][currentPlayer]["hand"]
-    let shields = "P1: " + game_state["players"][0]["shields"] + ", P2: " + game_state["players"][1]["shields"]
-        + ", P3: " + game_state["players"][2]["shields"] + ", P4: " + game_state["players"][3]["shields"]
+
 
     if (location.pathname === "/start-turn.html") {
         document.getElementById("player-number").innerText = "Player " + (currentPlayer + 1) + " start your turn";
@@ -67,8 +90,9 @@ window.onload = function () {
     if (location.pathname === "/play-turn.html") {
         document.getElementById("player-number").innerText = "Player " + (currentPlayer + 1);
         document.getElementById("player-hand").innerText = currentPlayerHand
-        document.getElementById("scores").innerText = shields
-        document.getElementById("draw_card_button").addEventListener("click", draw_card);
+        document.getElementById("draw_card_button").addEventListener("click", draw_event_card);
+        updateShields(game_state)
+        console.log(game_state["eventCard"])
 
     }
 };

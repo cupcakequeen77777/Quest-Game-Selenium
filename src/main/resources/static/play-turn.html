@@ -6,14 +6,29 @@
     <title>Quest Game</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="shortcut icon" href="#">
-
 </head>
 <body>
-<div class="container">
-    <div id="player-number">Default</div>
-    <button id="draw_card_button">Draw Card</button>
-    <div id="player-hand">Default</div>
-    <div id="scores">Default</div>
+<div class="flex-container">
+    <div id="info" class="container">
+        <div id="player-number">Default</div>
+        <button id="draw_card_button">Draw Event Card</button>
+        <div id="player-hand">Default</div>
+    </div>
+    <div id="play_area" class="container">
+        <div id="card_drawn">Default</div>
+    </div>
+    <div id="scores-container">
+        <div id="scores">
+            <div id="player1" class="player">Player 1</div>
+            <div id="player1-score" class="player-score">-</div>
+            <div id="player2" class="player">Player 2</div>
+            <div id="player2-score" class="player-score">-</div>
+            <div id="player3" class="player">Player 3</div>
+            <div id="player3-score" class="player-score">-</div>
+            <div id="player4" class="player">Player 4</div>
+            <div id="player4-score" class="player-score">-</div>
+        </div>
+    </div>
 </div>
 <script src="new-Game.js"></script>
 </body>
