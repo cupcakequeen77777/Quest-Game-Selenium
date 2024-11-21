@@ -3,12 +3,21 @@ const { Builder, By, until } = require('selenium-webdriver');
 async function runTest() {
     let driver = await new Builder().forBrowser('chrome').build();
 
-    try {
-        await driver.get('http://127.0.0.1:8081');
 
-        let startButton = await driver.findElement(By.xpath("//button[contains(text(), 'Start Game')]"));
+    try {
+
+        await driver.get('http://127.0.0.1:8081'); // FIXME: page is not being loaded, going to default index page with list of files
+
+        // let startButton = await driver.findElement(By.id('start_game_button'));
+        let startButton =  await driver.findElement(By.id('start_game_button'))
+
+        // let startButton = await driver.findElement(By.xpath("//button[contains(text(), 'Start Game')]"));
+        // // let startButton = await driver.findElement(By.xpath("//button[contains(text(), 'Start Game')]"));
         await startButton.click();
-        await driver.sleep(2000)
+        console.log("Game started successfully.");
+        await driver.sleep(10000)
+
+
 
         // await driver.wait(until.elementTextContains(driver.findElement(By.id('game-status')), 'Game started'), 10000);
         // console.log("Game started successfully.");

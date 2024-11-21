@@ -41,10 +41,9 @@ async function startTurn() {
 
 if (location.pathname === "/") {
     // Add event listener to the Start Game button
-    document.getElementById("start_turn_button").addEventListener("click", startGame);
+    document.getElementById("start_game_button").addEventListener("click", startGame);
 }
 
-// QUESTION: can we use REACT?
 async function draw_event_card() {
     // document.getElementById("draw_card_button").hidden = true
     // document.getElementById("card_drawn").innerText === "Changed"
