@@ -1,22 +1,24 @@
-const { Builder, By, until } = require('selenium-webdriver');
+const {Builder, By, until, added} = require('selenium-webdriver');
+const assert = require("node:assert");
 
 async function runTest() {
     let driver = await new Builder().forBrowser('chrome').build();
 
-
     try {
+        await driver.get('http://127.0.0.1:8080/');
+        // await driver.sleep(2000)
 
-        await driver.get('http://127.0.0.1:8081'); // FIXME: page is not being loaded, going to default index page with list of files
-
-        // let startButton = await driver.findElement(By.id('start_game_button'));
-        let startButton =  await driver.findElement(By.id('start_game_button'))
-
-        // let startButton = await driver.findElement(By.xpath("//button[contains(text(), 'Start Game')]"));
-        // // let startButton = await driver.findElement(By.xpath("//button[contains(text(), 'Start Game')]"));
+        let startButton = await getElementById(driver, 'start_game_button');
         await startButton.click();
+        let playerNumber = await getElementById(driver, 'player-number')
+        assert((await playerNumber.getText()).includes("start your turn"), "Player number is not displayed correctly");
         console.log("Game started successfully.");
-        await driver.sleep(10000)
+        // await driver.sleep(2000)
 
+        let startTurnButton = await getElementById(driver, 'start_turn_button');
+        await startTurnButton.click();
+        console.log("Turn started successfully.");
+        // await driver.sleep(2000)
 
 
         // await driver.wait(until.elementTextContains(driver.findElement(By.id('game-status')), 'Game started'), 10000);
@@ -54,6 +56,27 @@ async function runTest() {
     } finally {
         await driver.quit();
     }
+}
+
+async function getElementById(driver, id, timeout = 2000) {
+    const el = await driver.wait(until.elementLocated(By.id(id)), timeout);
+    return await driver.wait(until.elementIsVisible(el), timeout);
+}
+
+//     let hitStatus = await driver.findElement(By.id('game-status')).getText();
+async function getElementTextById(driver, id, timeout = 2000) {
+    const el = await driver.wait(until.elementLocated(By.id(id)), timeout);
+    return await driver.wait(until.elementIsVisible(el), timeout);
+}
+
+async function getElementByName(driver, name, timeout = 2000) {
+    const el = await driver.wait(until.elementLocated(By.name(name)), timeout);
+    return await driver.wait(until.elementIsVisible(el), timeout);
+}
+
+async function getElementByXpath(driver, xpath, timeout = 2000) {
+    const el = await driver.wait(until.elementLocated(By.xpath(xpath)), timeout);
+    return await driver.wait(until.elementIsVisible(el), timeout);
 }
 
 runTest();
