@@ -63,7 +63,6 @@ async function getElementById(driver, id, timeout = 2000) {
     return await driver.wait(until.elementIsVisible(el), timeout);
 }
 
-//     let hitStatus = await driver.findElement(By.id('game-status')).getText();
 async function getElementTextById(driver, id, timeout = 2000) {
     const el = await driver.wait(until.elementLocated(By.id(id)), timeout);
     return await driver.wait(until.elementIsVisible(el), timeout);

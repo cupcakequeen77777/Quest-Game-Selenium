@@ -18,6 +18,8 @@ public class Game {
     @Expose
     int playerTurn = 0;
     @Expose
+    int currentPlayer = 0;
+    @Expose
     Card eventCard = null;
     @Expose
     Quest quest = null;
@@ -260,7 +262,7 @@ public class Game {
             case 1: // Plague: current player loses 2 shields
                 print("Lose 2 shields\n");
                 currentPlayer.plague();
-                nextPlayer();
+                nextTurn();
                 break;
             case 2: // Queen’s favor: current player draws 2 adventure cards and possibly trims their hand (UC-03)
                 print("Draw 2 adventure cards\n");
@@ -285,7 +287,7 @@ public class Game {
                     player.addCard(card);
                     player.hand.sort();
                     trimCards();
-                    nextPlayer();
+//                    nextPlayer();
                 }
 
                 break;
@@ -314,7 +316,7 @@ public class Game {
                 }
             }
 
-            playerTurn = nextPlayer();
+            playerTurn = nextTurn();
 
         }
         eventDiscardDeck.add(eventCard);
@@ -325,11 +327,13 @@ public class Game {
 
 
     public int nextPlayer() {
-        print("Press <Enter> to end your turn\n");
-        input.nextLine();
-        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        currentPlayer = (currentPlayer + 1) % numberPlayers;
+        return currentPlayer;
+    }
 
-        return (playerTurn + 1) % numberPlayers;
+    public int nextTurn() {
+        playerTurn = (playerTurn + 1) % numberPlayers;
+        return playerTurn;
     }
 
     public Card startTurn() {
@@ -586,7 +590,7 @@ public class Game {
             eventDiscardDeck.add(eventCard);
             eventCard = null;
             quest = null;
-            playerTurn = nextPlayer();
+            playerTurn = nextTurn();
         } else {
             quest.currentStage++;
             print("Players continuing the quest: " + quest.stages.get(quest.currentStage).participants + "\n");
@@ -610,10 +614,11 @@ public class Game {
         JsonObject jsonObject = gson.fromJson(jsonString, JsonObject.class);
         jsonObject.addProperty("adventureDeck", adventureDeck.toJson());
         jsonObject.addProperty("eventDeck", eventDeck.toJson());
+        jsonObject.addProperty("eventDeck", eventDeck.toJson());
         jsonObject.addProperty("adventureDiscardDeck", adventureDiscardDeck.toJson());
         jsonObject.addProperty("eventDiscardDeck", eventDiscardDeck.toJson());
         jsonObject.addProperty("players", toJson(players));
-        if(eventCard != null) {
+        if (eventCard != null) {
             jsonObject.addProperty("eventCard", eventCard.toString());
         }
         // TODO: Implement toJson for Quest
