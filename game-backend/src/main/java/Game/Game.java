@@ -333,6 +333,7 @@ public class Game {
 
     public int nextTurn() {
         playerTurn = (playerTurn + 1) % numberPlayers;
+        currentPlayer = playerTurn;
         return playerTurn;
     }
 

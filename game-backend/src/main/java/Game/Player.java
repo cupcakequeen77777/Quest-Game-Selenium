@@ -12,6 +12,7 @@ public class Player {
     public int playerNumber;
     Deck hand;
     final int MAX_CARDS = 12;
+    int numberCards = 0;
     public int shields;
     boolean sponsor = false;
     public Deck attack;
@@ -49,9 +50,12 @@ public class Player {
         if (hand.size() > 1) {
             hand.sort();
         }
+        numberCards = hand.size();
+        System.out.println("Player " + playerNumber + " has " + hand.size() + " cards.");
     }
 
     public Card removeCard(int index) {
+        numberCards = hand.size();
         return hand.removeCard(index);
     }
 
@@ -67,7 +71,7 @@ public class Player {
     }
 
     public String toJson() {
-        return "{\"playerNumber\":" + playerNumber + ",\"shields\":" + shields + ",\"hand\":\"" + hand.toJson() + "\"}";
+        return "{\"playerNumber\":" + playerNumber + ",\"shields\":" + shields + ",\"numberCards\":" +  hand.size() + ",\"hand\":\"" + hand.toJson() + "\"}";
     }
 
     public int setupAttack(Scanner input, PrintWriter output) {

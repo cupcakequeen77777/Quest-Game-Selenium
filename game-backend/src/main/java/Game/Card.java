@@ -16,6 +16,12 @@ public class Card {
         cardType = c;
     }
 
+    public Card(String str, CardType c){
+        cardValue = Integer.parseInt(str.substring(1));
+        type = str.substring(0, 1);
+        cardType = c;
+    }
+
     public int getValue() {
         return cardValue;
     }
