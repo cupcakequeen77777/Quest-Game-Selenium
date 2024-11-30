@@ -21,18 +21,24 @@ public class GameController {
     @PostMapping("/start")
     public void startGame() {
 //        game.distributeCards();
-//        the_cards_have_been_distributed_to_the_players_Testing();
         distributeCardsFor2winner_game_2winner_quest();
     }
 
     public void distributeCardsFor2winner_game_2winner_quest() {
-        List<String> events = Arrays.asList("Q4", "Q3");
+        String[] events = {"Q4", "Q3"};
         String[] P1 = {"F5", "F5", "F10", "F10", "F15", "F15", "D5", "H10", "H10", "B15", "B15", "L20"};
         String[] P2 = {"F40", "F50", "H10", "H10", "S10", "S10", "S10", "B15", "B15", "L20", "L20", "E30"};
         String[] P3 = {"F5", "F5", "F5", "F5", "D5", "D5", "D5", "H10", "H10", "H10", "H10", "H10"};
         String[] P4 = {"F50", "F70", "H10", "H10", "S10", "S10", "S10", "B15", "B15", "L20", "L20", "E30"};
-        String[] cards = {"F5", "F40", "F10", "F10", "F30", "F30", "F15", "F15", "F20", "F5", "F10", "F15", "F15", "F20", "F20", "F20", "F20", "F25", "F25", "F30", "F5", "F5", "F15", "F15", "F25", "F25", "F20", "F20", "F25", "F30", "S10", "B15", "B15", "L20"};
+        String[] cards = {"F5", "F40", "F10", "F10", "F30", "F30", "F15", "F15", "F20", "F5", "F10", "F15", "F15",
+                "F20", "F20", "F20", "F20", "F25", "F25", "F30", "F5", "F5", "F15", "F15", "F25", "F25", "F20",
+                "F20", "F25", "F30", "S10", "B15", "B15", "L20"};
 
+        distributeCardsForScenario(events, P1, P2, P3, P4, cards);
+
+    }
+
+    public void distributeCardsForScenario(String[] events, String[] P1, String[] P2, String[] P3, String[] P4, String[] cards) {
         List<String> adventures = new ArrayList<>(List.of());
         for (int i = 0; i < P1.length; i++) {
             adventures.add(P1[i]);
@@ -53,61 +59,11 @@ public class GameController {
         Collections.reverse(adventureCards);
         rigAdventureEventDeck(eventCards, adventureCards);
         game.distributeCards();
-        System.out.println(game.players.get(0).hand);
-        System.out.println(game.players.get(1).hand);
-        System.out.println(game.players.get(2).hand);
-        System.out.println(game.players.get(3).hand);
+        System.out.println(game.players.get(0).hand); // REMOVE
+        System.out.println(game.players.get(1).hand); // REMOVE
+        System.out.println(game.players.get(2).hand); // REMOVE
+        System.out.println(game.players.get(3).hand); // REMOVE
 
-    }
-
-    public void the_cards_have_been_distributed_to_the_players_Testing() {
-        setInitialHands1(game);
-
-        List<Card> eventCards = Arrays.asList(
-                new Card(4, "Q", Card.CardType.EVENT),
-                new Card(4, "Q", Card.CardType.EVENT));
-        Collections.reverse(eventCards);
-        Card.CardType type = Card.CardType.ADVENTURE;
-        List<Card> adventureCards = Arrays.asList(
-                new Card(20, "L", type),
-                new Card(30, "F", type),
-                new Card(10, "S", type),
-                new Card(15, "B", type),
-                new Card(20, "L", type),
-                new Card(20, "L", type),
-                new Card(10, "F", type),
-                new Card(15, "B", type),
-                new Card(10, "S", type),
-                new Card(30, "F", type)
-        );
-        rigAdventureEventDeck(eventCards, adventureCards);
-
-    }
-
-    void setInitialHands1(Game game) {
-        int[] values1 = {5, 5, 15, 15, 5, 10, 10, 10, 10, 15, 15, 20};
-        String[] types1 = {"F", "F", "F", "F", "D", "S", "S", "H", "H", "B", "B", "L"};
-        int[] values2 = {5, 5, 15, 15, 40, 5, 10, 10, 10, 15, 15, 30};
-        String[] types2 = {"F", "F", "F", "F", "F", "D", "S", "H", "H", "B", "B", "E"};
-        int[] values3 = {5, 5, 5, 15, 5, 10, 10, 10, 10, 10, 15, 20};
-        String[] types3 = {"F", "F", "F", "F", "D", "S", "S", "S", "H", "H", "B", "L"};
-        int[] values4 = {5, 15, 15, 40, 5, 5, 10, 10, 10, 15, 20, 30};
-        String[] types4 = {"F", "F", "F", "F", "D", "D", "S", "H", "H", "B", "L", "E"};
-
-        setHand(game.getPlayers().get(0), values1, types1);
-        setHand(game.getPlayers().get(1), values2, types2);
-        setHand(game.getPlayers().get(2), values3, types3);
-        setHand(game.getPlayers().get(3), values4, types4);
-        game.getPlayers().get(0).getHand().sort();
-        game.getPlayers().get(1).getHand().sort();
-        game.getPlayers().get(2).getHand().sort();
-        game.getPlayers().get(3).getHand().sort();
-    }
-
-    void setHand(Player p, int[] values, String[] types) {
-        for (int i = 0; i < 12; i++) {
-            p.addCard(game.getAdventureDeck().removeCard(new Card(values[i], types[i], Card.CardType.ADVENTURE)));
-        }
     }
 
     private void rigAdventureEventDeck(List<Card> eventCards, List<Card> adventureCards) {
@@ -124,9 +80,8 @@ public class GameController {
         }
         Collections.reverse(adventureDeck.deck);
 
-        System.out.println(eventDeck);
-        System.out.println(adventureDeck);
-
+        System.out.println(eventDeck); // REMOVE
+        System.out.println(adventureDeck); // REMOVE
 
     }
 
