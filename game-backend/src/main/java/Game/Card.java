@@ -1,5 +1,7 @@
 package Game;
 
+import java.util.Objects;
+
 public class Card {
     public enum CardType {
         ADVENTURE,
@@ -16,9 +18,40 @@ public class Card {
         cardType = c;
     }
 
-    public Card(String str, CardType c){
-        cardValue = Integer.parseInt(str.substring(1));
-        type = str.substring(0, 1);
+    public Card(String str, CardType c) {
+        str = str.trim();
+        str = str.toUpperCase();
+        if (str.equals("Dagger".toUpperCase())) {
+            type = "D";
+            cardValue = 5;
+        } else if (str.equals("Horse".toUpperCase())) {
+            type = "H";
+            cardValue = 10;
+        } else if (str.equals("Sword".toUpperCase())) {
+            type = "S";
+            cardValue = 10;
+        } else if (str.equals("Axe".toUpperCase())) {
+            type = "B";
+            cardValue = 15;
+        } else if (str.equals("Lance".toUpperCase())) {
+            type = "L";
+            cardValue = 20;
+        } else if (str.equals("Excalibur".toUpperCase())) {
+            type = "E";
+            cardValue = 30;
+        } else if (str.equals("Plague".toUpperCase())) {
+            type = "E";
+            cardValue = 1;
+        } else if (str.equals("Queen’s favor".toUpperCase())) {
+            type = "E";
+            cardValue = 2;
+        } else if (str.equals("Prosperity".toUpperCase())) {
+            type = "E";
+            cardValue = 3;
+        } else {
+            cardValue = Integer.parseInt(str.substring(1));
+            type = str.substring(0, 1).toUpperCase();
+        }
         cardType = c;
     }
 

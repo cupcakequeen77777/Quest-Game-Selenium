@@ -39,6 +39,15 @@ public class Deck {
         return deck.get(i);
     }
 
+    public boolean getCard(Card x) {
+        for (Card card : deck) {
+            if (card.equals(x)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Card removeCard(Card x) {
         for (int i = 0; i < deck.size(); i++) {
             if (deck.get(i).equals(x)) {

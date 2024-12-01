@@ -1,9 +1,6 @@
 package Game;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -14,14 +11,28 @@ public class GameController {
     Game game;
 
     public GameController() {
-        game = new Game();
+
 //        resetGame();
     }
 
     @PostMapping("/start")
     public void startGame() {
+        game = new Game();
+        distributeCardsForTesting();
 //        game.distributeCards();
-        distributeCardsFor2winner_game_2winner_quest();
+//        distributeCardsFor2winner_game_2winner_quest();
+//        distributeCardsFor1winner_game_with_events();
+//        distributeCardsFor0_winner_quest();
+    }
+
+    public void distributeCardsForTesting() {
+        String[] events = {"E2"};
+        String[] P1 = {"F50", "F70", "D5", "D5", "H10", "H10", "S10", "S10", "B15", "B15", "L20", "L20"};
+        String[] P2 = {"F5", "F5", "F10", "F15", "F15", "F20", "F20", "F25", "F30", "F30", "F40", "E30"};
+        String[] P3 = {"F5", "F5", "F10", "F15", "F15", "F20", "F20", "F25", "F25", "F30", "F40", "L20"};
+        String[] P4 = {"F5", "F5", "F10", "F15", "F15", "F20", "F20", "F25", "F25", "F30", "F50", "E30"};
+        String[] cards = {"F5", "F15", "F10", "F5", "F10", "F15", "D5", "D5", "D5", "D5", "H10", "H10", "H10", "H10", "S10", "S10", "S10"};
+        distributeCardsForScenario(events, P1, P2, P3, P4, cards);
     }
 
     public void distributeCardsFor2winner_game_2winner_quest() {
@@ -37,6 +48,29 @@ public class GameController {
         distributeCardsForScenario(events, P1, P2, P3, P4, cards);
 
     }
+
+
+    public void distributeCardsFor0_winner_quest() {
+        String[] events = {"Q2"};
+        String[] P1 = {"F50", "F70", "D5", "D5", "H10", "H10", "S10", "S10", "B15", "B15", "L20", "L20"};
+        String[] P2 = {"F5", "F5", "F10", "F15", "F15", "F20", "F20", "F25", "F30", "F30", "F40", "E30"};
+        String[] P3 = {"F5", "F5", "F10", "F15", "F15", "F20", "F20", "F25", "F25", "F30", "F40", "L20"};
+        String[] P4 = {"F5", "F5", "F10", "F15", "F15", "F20", "F20", "F25", "F25", "F30", "F50", "E30"};
+        String[] cards = {"F5", "F15", "F10", "F5", "F10", "F15", "D5", "D5", "D5", "D5", "H10", "H10", "H10", "H10", "S10", "S10", "S10"};
+        distributeCardsForScenario(events, P1, P2, P3, P4, cards);
+    }
+
+
+    public void distributeCardsFor1winner_game_with_events() {
+        String[] events = {"Q4", "E1", "E3", "E2", "Q3"};
+        String[] P1 = {"F5", "F5", "F10", "F10", "F15", "F15", "F20", "F20", "D5", "D5", "D5", "D5"};
+        String[] P2 = {"F25", "F30", "H10", "H10", "S10", "S10", "S10", "B15", "B15", "L20", "L20", "E30"};
+        String[] P3 = {"F25", "F30", "H10", "H10", "S10", "S10", "S10", "B15", "B15", "L20", "L20", "E30"};
+        String[] P4 = {"F25", "F30", "F70", "H10", "H10", "S10", "S10", "S10", "B15", "B15", "L20", "L20"};
+        String[] cards = {};
+        distributeCardsForScenario(events, P1, P2, P3, P4, cards);
+    }
+
 
     public void distributeCardsForScenario(String[] events, String[] P1, String[] P2, String[] P3, String[] P4, String[] cards) {
         List<String> adventures = new ArrayList<>(List.of());
@@ -151,17 +185,33 @@ public class GameController {
         return "prosperity card played";
     }
 
-    @PostMapping("/decline_quest")
-    public int decline_quest() {
+    @PostMapping("/decline_sponsorship")
+    public int decline_sponsorship() {
         game.players.get(game.currentPlayer).sponsor = false;
         return game.currentPlayer;
     }
 
-    @PostMapping("/accept_quest")
+    @PostMapping("/sponsor_quest")
     public String accept_quest() {
         game.quest.sponsor = game.players.get(game.currentPlayer); // TODO: fix this!!!
         game.players.get(game.currentPlayer).sponsor = true;
-        return "accept_quest";
+        return "sponsor_quest";
+    }
+
+    @GetMapping("/check_valid_card")
+    public boolean check_valid_card(@RequestParam(name = "card", required = false, defaultValue = "F0") String card) {
+        Card newCard = new Card(card, Card.CardType.ADVENTURE);
+        System.out.println("Checking card: " + newCard);
+        return game.players.get(game.currentPlayer).hand.getCard(newCard);
+    }
+
+    @GetMapping("/discard_card")
+    public String discard_card(@RequestParam(name = "card", required = false, defaultValue = "F0") String card) {
+        Card newCard = new Card(card, Card.CardType.ADVENTURE);
+        System.out.println("Discarding card: " + newCard);
+        game.players.get(game.currentPlayer).hand.removeCard(newCard);
+        game.adventureDiscardDeck.add(newCard);
+        return newCard + "";
     }
 
 

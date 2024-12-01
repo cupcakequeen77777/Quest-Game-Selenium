@@ -45,6 +45,7 @@ if (location.pathname === "/") {
     document.getElementById("start_game_button").addEventListener("click", startGame);
 }
 
+// TODO:
 async function declineQuest() {
     await fetch(`${apiBaseUrl}/decline_quest`, {method: "POST"});
     await nextPlayer()
@@ -78,6 +79,7 @@ async function declineQuest() {
 
 }
 
+// TODO:
 async function acceptQuest() {
     // FIXME: need to implement accept_quest
     // let response = await fetch(`${apiBaseUrl}/accept_quest`, {method: "POST"});
@@ -99,10 +101,71 @@ async function acceptQuest() {
     console.log("acceptQuest")
     document.getElementById("end_turn_button").hidden = false;
 
+}
+
+
+async function declineSponsorship() {
+    await fetch(`${apiBaseUrl}/decline_sponsorship`, {method: "POST"});
+    await nextPlayer()
+    await getGameState()
+    let game_state = AccessGameState()
+
+    currentPlayer = game_state["currentPlayer"]
+    let playerTurn = game_state["playerTurn"]
+
+    console.log("playerTurn: " + playerTurn)
+    console.log("currentPlayer: " + currentPlayer)
+
+
+    if (currentPlayer === playerTurn) {
+        document.getElementById("yes_button").hidden = true;
+        document.getElementById("no_button").hidden = true;
+        document.getElementById("draw_card_button").hidden = true;
+        document.getElementById("end_turn_button").hidden = false;
+        document.getElementById("card_drawn").innerText = ""
+        console.log("Start New Turn")
+    } else {
+        console.log("Decline Quest, Next player")
+        await getGameState()
+        let game_state = AccessGameState()
+        document.getElementById("card_drawn").innerText = "\nDo you want to sponsor the quest with " + game_state["quest"]["numStages"] + " stages?"
+        document.getElementById("yes_button").hidden = false;
+        document.getElementById("no_button").hidden = false;
+        currentPlayer = game_state["currentPlayer"]
+        updatePlayerHand(game_state, currentPlayer)
+    }
 
 }
 
-async function draw_event_card() {
+async function sponsorQuest() {
+    // FIXME: need to implement accept_quest
+    // let response = await fetch(`${apiBaseUrl}/sponsor_quest`, {method: "POST"});
+    // const nextPlayer = await response.text();
+    // console.log("accept_quest Response:", nextPlayer);
+    // let game_state = Object(AccessGameState())
+    // updatePlayerHand(game_state, nextPlayer)
+    document.getElementById("card_drawn").innerText = "acceptQuest"
+
+
+    // let response = await fetch(`${apiBaseUrl}/accept_quest`, {method: "POST"});
+    // const nextPlayer = await response.text();
+    // console.log("accept_quest Response:", nextPlayer);
+    // await getGameState()
+    // let game_state = AccessGameState()
+    // updatePlayerHand(game_state, parseInt(nextPlayer))
+    console.log("acceptQuest")
+    document.getElementById("end_turn_button").hidden = false;
+
+
+    // TODO: Ask player if they want to participate in the quest, move to function after player submits all cards they want to use.
+    // document.getElementById("no_button").addEventListener("click", declineQuest);
+    // document.getElementById("yes_button").addEventListener("click", acceptQuest);
+    // document.getElementById("yes_button").hidden = false;
+    // document.getElementById("no_button").hidden = false;
+
+}
+
+async function drawEventCard() {
     document.getElementById("draw_card_button").hidden = true;
 
     try {
@@ -129,12 +192,10 @@ async function draw_event_card() {
                 document.getElementById("card_drawn").innerText += "\nDraw 2 adventure cards: "
                 let cards = await queensFavor();
                 document.getElementById("card_drawn").innerText += " " + cards
-
                 await getGameState()
                 game_state = Object(AccessGameState())
-                console.log("currentPlayer: " + currentPlayer)
                 updateHand(game_state)
-                document.getElementById("end_turn_button").hidden = false;
+                await checkNumberCards()
                 break;
             case "Prosperity": // FIXME: everyone does a queen's favour, then discards extra cards
                 document.getElementById("card_drawn").innerText += "\nEveryone draws 2 cards"
@@ -147,6 +208,8 @@ async function draw_event_card() {
                 break;
             default:
                 document.getElementById("card_drawn").innerText += "\nDo you want to participate in the quest?"
+                document.getElementById("no_button").addEventListener("click", declineSponsorship);
+                document.getElementById("yes_button").addEventListener("click", sponsorQuest);
                 document.getElementById("yes_button").hidden = false;
                 document.getElementById("no_button").hidden = false;
                 break;
@@ -261,6 +324,61 @@ function updatePlayerHand(game_state, currentPlayer) {
     document.getElementById("player-hand").innerText = currentPlayerHand
 }
 
+async function selectCard() {
+    let card = document.getElementById("cardInput").value
+    document.getElementById("cardInput").value = ""
+    // DONE: pass to game to check if it is a valid card
+    let response = await fetch(`${apiBaseUrl}/check_valid_card?card=${card}`);
+    let result = await response.text();
+    if (result === "true") {
+        return card
+    } else {
+        document.getElementById("card_drawn").innerText += "\nInvalid card, please try again"
+        return ""
+    }
+
+}
+
+async function checkNumberCards() {
+    await getGameState()
+    let game_state = Object(AccessGameState())
+    let numberCards = game_state["players"][currentPlayer]["numberCards"]
+    console.log("numberCards: " + numberCards)
+    if (numberCards > 12) {
+        document.getElementById("card_drawn").innerText += "\nYou have more than 12 cards, discard down to 12"
+        document.getElementById("enter_cards").hidden = false;
+        return true
+    }
+    document.getElementById("enter_cards").hidden = true;
+
+    return false
+}
+
+
+async function submitCardForDiscard() {
+    // DONE: how function to handle selection of cards and validation, returns the card selected
+    console.log("submitCardForDiscard")
+    let card = await selectCard()
+    if (card === "") {
+        document.getElementById("enter_cards").hidden = false;
+    } else {
+        let response = await fetch(`${apiBaseUrl}/discard_card?card=${card}`);
+        let discardedCard = await response.text();
+        document.getElementById("card_drawn").innerText += "\nYou discarded: " + discardedCard
+        await getGameState()
+        let game_state = Object(AccessGameState())
+        updateHand(game_state)
+        let moreToDiscard = await checkNumberCards()
+        if (moreToDiscard) {
+            document.getElementById("enter_cards").hidden = false;
+        } else {
+            document.getElementById("enter_cards").hidden = true;
+            document.getElementById("end_turn_button").hidden = false;
+        }
+    }
+
+
+}
 
 // This function will run when the start-turn page loads
 window.onload = function () {
@@ -277,11 +395,12 @@ window.onload = function () {
     if (location.pathname === "/play-turn.html") {
         document.getElementById("player-number").innerText = "Player " + (currentPlayer + 1);
         document.getElementById("player-hand").innerText = currentPlayerHand
-        document.getElementById("draw_card_button").addEventListener("click", draw_event_card);
-        document.getElementById("no_button").addEventListener("click", declineQuest);
-        document.getElementById("yes_button").addEventListener("click", acceptQuest);
+        document.getElementById("draw_card_button").addEventListener("click", drawEventCard);
+        document.getElementById("no_button").addEventListener("click", declineSponsorship);
+        document.getElementById("yes_button").addEventListener("click", sponsorQuest);
         document.getElementById("end_turn_button").addEventListener("click", endTurn);
         document.getElementById("start_turn_button").addEventListener("click", startNewTurn);
+        document.getElementById("submit_card_button").addEventListener("click", submitCardForDiscard);
         updateShields(game_state)
         console.log(game_state["eventCard"])
 
