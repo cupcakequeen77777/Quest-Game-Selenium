@@ -74,6 +74,20 @@ public class GameController {
         distributeCardsForScenario(events, P1, P2, P3, P4, cards);
     }
 
+    //    And player 1 hand should be "F5 F5 F15 F15 Dagger Sword Sword Horse Horse Axe Axe Lance "
+    //    And player 2 hand should be "F5 F5 F15 F15 F40 Dagger Sword Horse Horse Axe Axe Excalibur "
+    //    And player 3 hand should be "F5 F5 F5 F15 Dagger Sword Sword Sword Horse Horse Axe Lance "
+    //    And player 4 hand should be "F5 F15 F15 F40 Dagger Dagger Sword Horse Horse Axe Lance Excalibur "
+    public void distributeCardsForA_TEST_JP_Scenario() {
+        String[] events = {"Q4"};
+        String[] P1 = {"F5", "F5", "F15", "F15", "D5", "S10", "H10", "H10", "S10", "B15", "B15", "L20"};
+        String[] P2 = {"F5", "F5", "F15", "F15", "F40", "D5", "S10", "H10", "H10", "B15", "B15", "E30"};
+        String[] P3 = {"F5", "F5", "F5", "F15", "D5", "S10", "S10", "S10", "H10", "H10", "B15", "L20"};
+        String[] P4 = {"F5", "F15", "F15", "F40", "D5", "D5", "S10", "H10", "H10", "B15", "L20", "E30"};
+        String[] cards = {"F30", "S10", "B15", "F10", "L20", "L20", "B15", "S10", "F30", "L20"};
+        distributeCardsForScenario(events, P1, P2, P3, P4, cards);
+    }
+
 
     public void distributeCardsForScenario(String[] events, String[] P1, String[] P2, String[] P3, String[] P4, String[] cards) {
         List<String> adventures = new ArrayList<>(List.of());
@@ -278,6 +292,12 @@ public class GameController {
         player.hand.removeCard(newCard);
         player.calculateAttackValue();
         return true;
+    }
+
+    @GetMapping("/set_current_player")
+    public boolean set_current_player(@RequestParam(name = "playerNumber", required = false, defaultValue = "0") int playerNumber) {
+        game.currentPlayer = playerNumber;
+        return false;
     }
 
 
