@@ -1,5 +1,7 @@
 package Game;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,24 +61,31 @@ public class Quest {
         return str.toString();
     }
 
-    public String toJson() {
-        StringBuilder str = new StringBuilder();
-        str.append("{\n");
-        str.append("\"numStages\": ").append(numStages).append(",\n");
-        str.append("\"isCompleted\": ").append(isCompleted).append(",\n");
-        str.append("\"currentStage\": ").append(currentStage).append(",\n");
-        str.append("\"sponsor\": ").append(sponsor).append(",\n");
-        str.append("\"stages\": [");
-        for (int i = 0; i < stages.size(); i++) {
-            str.append(stages.get(i).toJson());
-            if (i != stages.size() - 1) {
-                str.append(", ");
-            }
-        }
-        str.append("]\n");
-        str.append("}\n");
+//    public String toJson() {
+//        StringBuilder str = new StringBuilder();
+//        str.append("{\n");
+//        str.append("\"numStages\": \"").append(numStages).append("\",\n");
+//        str.append("\"isCompleted\": \"").append(isCompleted).append("\",\n");
+//        str.append("\"currentStage\": \"").append(currentStage).append("\",\n");
+//        str.append("\"sponsor\": \"").append(sponsor).append("\",\n");
+//        str.append("\"stages\": \"[");
+//        for (int i = 0; i < stages.size(); i++) {
+//            str.append(stages.get(i).toJson());
+//            if (i != stages.size() - 1) {
+//                str.append(", ");
+//            }
+//        }
+//        str.append("]\"\n");
+//        str.append("}\n");
+//        System.out.println(str); // REMOVE
+//
+//        return str.toString();
+//    }
 
-        return str.toString();
+    // Method to convert Stage object to JSON
+    public String toJson() {
+        Gson gson = new Gson();
+        return gson.toJson(this);
     }
 }
 

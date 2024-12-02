@@ -114,7 +114,7 @@ public class Player {
         }
 
         // Calculate total attack value based on attackDeck
-        attackValue = calculateAttackValue(attack);
+        attackValue = calculateAttackValue();
         output.print("Your attack value is " + attackValue + "\n");
         output.flush();
 
@@ -135,9 +135,9 @@ public class Player {
         return true;
     }
 
-    private int calculateAttackValue(Deck attackDeck) {
+    public int calculateAttackValue() {
         int totalValue = 0;
-        for (Card card : attackDeck.getDeck()) {
+        for (Card card : attack.getDeck()) {
             totalValue += card.getValue();
         }
         return totalValue;

@@ -1,5 +1,7 @@
 package Game;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -8,6 +10,7 @@ import java.util.*;
 @CrossOrigin(origins = "http://127.0.0.1:8080")
 public class GameController {
 
+    private static final Logger log = LoggerFactory.getLogger(GameController.class);
     Game game;
 
     public GameController() {
@@ -135,7 +138,9 @@ public class GameController {
         game.eventCard = newCard;
         if (newCard.type.equals("Q")) {
             game.quest = new Quest(newCard.cardValue);
-            game.quest.addStage(new Stage());
+            for (int i = 0; i < game.quest.numStages; i++) {
+                game.quest.addStage(new Stage());
+            }
 
         }
         return newCard.toString(); // Card that was drawn
@@ -144,7 +149,7 @@ public class GameController {
     @PostMapping("/draw_adventure_card")
     public String draw_adventure_card() {
         Card newCard = game.drawAdventureCard();
-        game.players.get(game.playerTurn).addCard(newCard);
+        game.players.get(game.currentPlayer).addCard(newCard);
         return newCard.toString(); // Card that was drawn
     }
 
@@ -197,6 +202,7 @@ public class GameController {
     public boolean sponsor_quest() {
         game.quest.sponsor = game.players.get(game.currentPlayer);
         game.players.get(game.currentPlayer).sponsor = true;
+
         // FIXME: check if the player can actually sponsor the quest
         return true;
     }
@@ -227,8 +233,7 @@ public class GameController {
         } else {
             game.quest.stages.get(game.quest.currentStage).weaponCards.add(newCard);
         }
-        System.out.println("here");
-        System.out.println(game.quest);
+        game.quest.stages.get(game.quest.currentStage).calculateValue();
         return newCard + "";
     }
 
@@ -237,13 +242,42 @@ public class GameController {
         game.quest.stages.get(game.quest.currentStage).calculateValue();
         game.quest.currentStage++;
         if (game.quest.currentStage < game.quest.numStages) {
-            game.quest.addStage(new Stage());
             System.out.println("Sponsoring next stage: " + game.quest.currentStage);
             System.out.println("Quest stages: " + game.quest.stages.size());
             return true;
         }
 
         return false;
+    }
+
+    @PostMapping("/reset_current_stage")
+    public boolean reset_current_stage() {
+        game.quest.stages.get(game.quest.currentStage).calculateValue();
+        System.out.println("Quest set up complete");
+        game.quest.currentStage = 0;
+        return true;
+    }
+
+    @PostMapping("/accept_quest")
+    public boolean accept_quest() {
+        System.out.println("Accepting quest");
+        System.out.println(game.quest.currentStage);
+        game.quest.stages.get(game.quest.currentStage).participants.add(game.players.get(game.currentPlayer));
+        return true;
+    }
+
+    @GetMapping("/enter_card_for_attack")
+    public boolean enter_card_for_attack(@RequestParam(name = "card", required = false, defaultValue = "F0") String card) {
+        Card newCard = new Card(card, Card.CardType.ADVENTURE);
+        Player player = game.players.get(game.currentPlayer);
+        if (!player.isValidAttackCard(newCard)) {
+            return false;
+        }
+        System.out.println("enter_card_for_attack card: " + newCard);
+        player.attack.add(newCard);
+        player.hand.removeCard(newCard);
+        player.calculateAttackValue();
+        return true;
     }
 
 

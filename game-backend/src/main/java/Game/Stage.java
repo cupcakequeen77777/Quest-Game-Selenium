@@ -1,5 +1,7 @@
 package Game;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 
 public class Stage {
@@ -86,42 +88,67 @@ public class Stage {
         return str.toString();
     }
 
+//    // Method to convert Stage object to JSON string
+//    public String toJson() {
+//        StringBuilder json = new StringBuilder();
+//        String newFoeCard;
+//        if (foeCard == null) {
+//            newFoeCard = "null";
+//        } else {
+//            newFoeCard = foeCard.toString();
+//        }
+//        json.append("{");
+//        json.append("\"foeCard\":\"").append(newFoeCard).append("\",");
+//        json.append("\"weaponCards\":\"").append(weaponCards.toJson()).append("\",");
+//        json.append("\"value\":\"").append(value).append("\",");
+//        json.append("\"participants\":\"").append(participantsToJson());
+//        json.append("\"}");
+//        return json.toString();
+//    }
+
+    // Method to convert Stage object to JSON
     public String toJson() {
+        Gson gson = new Gson();
+        return gson.toJson(this);
+    }
+
+    // Helper method to convert participants list to JSON
+    private String participantsToJson() {
         StringBuilder json = new StringBuilder();
-        String newFoeCard;
-        if (foeCard == null) {
-            newFoeCard = "null";
-        } else {
-            newFoeCard = foeCard.toString();
-        }
-        json.append("{");
-        json.append("\"foeCard\":\"").append(newFoeCard).append("\",");
-        json.append("\"weaponCards\":\"").append(weaponCards.toJson()).append("\",");
-        json.append("\"value\":\"").append(value).append("\",");
-        json.append("\"participants\":").append("\"[");
+        json.append("[");
         for (int i = 0; i < participants.size(); i++) {
-            json.append(participants.get(i).toJson());
+            json.append(participants.get(i).playerNumber);
             if (i < participants.size() - 1) {
                 json.append(",");
             }
         }
-        json.append("]\"");
-        json.append("}");
-        System.out.println(json.toString());
+        json.append("]");
         return json.toString();
     }
 
+
 //    public String toJson() {
-//        StringBuilder str = new StringBuilder();
-//        str.append("{\n");
-//        str.append("\"value\": ").append(value).append(",\n");
-//        str.append("\"foeCard\": ").append(foeCard).append(",\n");
-//        str.append("\"weaponCards\": ");
-//        for (int i = 0; i < weaponCards.getDeck().size(); i++) {
-//            str.append(weaponCards.toJson());
+//        StringBuilder json = new StringBuilder();
+//        String newFoeCard;
+//        if (foeCard == null) {
+//            newFoeCard = "null";
+//        } else {
+//            newFoeCard = foeCard.toString();
 //        }
-//        str.append("\n");
-//        str.append("}");
-//        return str.toString();
+//        json.append("{");
+//        json.append("\"foeCard\":\"").append(newFoeCard).append("\",");
+//        json.append("\"weaponCards\":\"").append(weaponCards.toJson()).append("\",");
+//        json.append("\"value\":\"").append(value).append("\"");
+////                ",");
+////        json.append("\"participants\":").append("\"[");
+////        for (int i = 0; i < participants.size(); i++) {
+////            json.append(participants.get(i).playerNumber);
+////            if (i < participants.size() - 1) {
+////                json.append(",");
+////            }
+////        }
+////        json.append("]\"");
+//        json.append("}");
+//        return json.toString();
 //    }
 }
