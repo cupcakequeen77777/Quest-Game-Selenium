@@ -108,6 +108,9 @@ public class Deck {
 
     public String toJson() {
         StringBuilder builder = new StringBuilder();
+        if(deck.isEmpty()) {
+            return "[]";
+        }
         for (Card card : getDeck()) {
             builder.append(card).append(" ");
         }

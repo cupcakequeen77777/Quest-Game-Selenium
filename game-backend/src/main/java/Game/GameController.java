@@ -26,7 +26,7 @@ public class GameController {
     }
 
     public void distributeCardsForTesting() {
-        String[] events = {"E2"};
+        String[] events = {"Q2"};
         String[] P1 = {"F50", "F70", "D5", "D5", "H10", "H10", "S10", "S10", "B15", "B15", "L20", "L20"};
         String[] P2 = {"F5", "F5", "F10", "F15", "F15", "F20", "F20", "F25", "F30", "F30", "F40", "E30"};
         String[] P3 = {"F5", "F5", "F10", "F15", "F15", "F20", "F20", "F25", "F25", "F30", "F40", "L20"};
@@ -135,6 +135,8 @@ public class GameController {
         game.eventCard = newCard;
         if (newCard.type.equals("Q")) {
             game.quest = new Quest(newCard.cardValue);
+            game.quest.addStage(new Stage());
+
         }
         return newCard.toString(); // Card that was drawn
     }
@@ -192,10 +194,11 @@ public class GameController {
     }
 
     @PostMapping("/sponsor_quest")
-    public String accept_quest() {
-        game.quest.sponsor = game.players.get(game.currentPlayer); // TODO: fix this!!!
+    public boolean sponsor_quest() {
+        game.quest.sponsor = game.players.get(game.currentPlayer);
         game.players.get(game.currentPlayer).sponsor = true;
-        return "sponsor_quest";
+        // FIXME: check if the player can actually sponsor the quest
+        return true;
     }
 
     @GetMapping("/check_valid_card")
@@ -212,6 +215,35 @@ public class GameController {
         game.players.get(game.currentPlayer).hand.removeCard(newCard);
         game.adventureDiscardDeck.add(newCard);
         return newCard + "";
+    }
+
+    @GetMapping("/enter_card_for_stage")
+    public String enter_card_for_stage(@RequestParam(name = "card", required = false, defaultValue = "F0") String card) {
+        Card newCard = new Card(card, Card.CardType.ADVENTURE);
+        System.out.println("enter_card_for_stage card: " + newCard);
+        game.players.get(game.currentPlayer).hand.removeCard(newCard);
+        if (newCard.isFoe()) {
+            game.quest.stages.get(game.quest.currentStage).foeCard = newCard;
+        } else {
+            game.quest.stages.get(game.quest.currentStage).weaponCards.add(newCard);
+        }
+        System.out.println("here");
+        System.out.println(game.quest);
+        return newCard + "";
+    }
+
+    @PostMapping("/sponsor_next_stage")
+    public boolean sponsor_next_stage() {
+        game.quest.stages.get(game.quest.currentStage).calculateValue();
+        game.quest.currentStage++;
+        if (game.quest.currentStage < game.quest.numStages) {
+            game.quest.addStage(new Stage());
+            System.out.println("Sponsoring next stage: " + game.quest.currentStage);
+            System.out.println("Quest stages: " + game.quest.stages.size());
+            return true;
+        }
+
+        return false;
     }
 
 
