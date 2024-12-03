@@ -9,6 +9,7 @@ async function runTest() {
         // await driver.sleep(2000)
 
         let startButton = await getElementById(driver, 'start_game_button');
+
         await startButton.click();
         let playerNumber = await getElementById(driver, 'player-number')
         assert((await playerNumber.getText()).includes("start your turn"), "Player number is not displayed correctly");
@@ -19,11 +20,10 @@ async function runTest() {
         console.log("Turn started successfully.");
         await driver.sleep(500)
 
-        // NOTE: start a turn and draw a card
         let draw_card_button = await getElementById(driver, 'draw_card_button');
-        await draw_card_button.click();
-        console.log("Drew a cards.");
-        await driver.sleep(500)
+
+        // PP1 draws a 2 stage quest and decides to sponsor it.
+        await drawEventCard(driver, draw_card_button);
 
         // NOTE: player 1 choose to sponsor quest
         let yes_button = await getElementById(driver, 'yes_button');
@@ -37,52 +37,17 @@ async function runTest() {
         // Player 1 enters cards to sponsor quest stage 2
         await playCards(driver, ["F70", "dagger", "sword", "horse", "axe", "lance"]);
         // TODO: the player card area is still there, need to remove it
+        // TODO: change text on draw event card to draw adventure card
+
 
         let end_turn_button = await getElementById(driver, 'end_turn_button');
         await end_turn_button.click();
-        await driver.sleep(500)
+        await driver.sleep(1000)
 
-
-
-        // TODO: change text on draw event card to draw adventure card
-        // TODO: move to function
-        // Ask player 2 for participation in quest
-        await yes_button.click();
-        await driver.sleep(500)
         // P2 participates, draws 1xF5, discards F5
-        await draw_card_button.click();
-        await driver.sleep(1000)
-        await playCard(driver, "F5");
-        await end_turn_button.click();
-
-        // Ask player 2 for participation in quest
-        await yes_button.click();
-        await driver.sleep(500)
         // P3 participates, draws 1xF15, discards F15
-        await draw_card_button.click();
-        await driver.sleep(1000)
-        await playCard(driver, "F15");
-        await end_turn_button.click();
-
-        // Ask player 2 for participation in quest
-        await yes_button.click();
-        await driver.sleep(500)
         // P4 participates, draws 1xF10, discards F10
-        await draw_card_button.click();
-        await driver.sleep(1000)
-        await playCard(driver, "F10");
-        await end_turn_button.click();
-
-
-
-        // let card = "F5";
-        // let cardInput = await getElementById(driver, 'cardInput');
-        // let submit_card_button = await getElementById(driver, 'submit_card_button');
-        // await cardInput.sendKeys(card);
-        // await driver.sleep(3000)
-        // await submit_card_button.click();
-        // console.log("player 2 plays " + card);
-        // await driver.sleep(5000)
+        await allPlayersParticipate(driver, yes_button, draw_card_button, end_turn_button, ["F5", "F15", "F10"]);
 
 
         await driver.sleep(20000)
@@ -125,6 +90,11 @@ async function runTest() {
     }
 }
 
+async function drawEventCard(driver, draw_card_button) {
+    await draw_card_button.click();
+    await driver.sleep(500)
+}
+
 async function playCards(driver, cardForStage) {
     for (let card of cardForStage) {
         await playCard(driver, card)
@@ -139,8 +109,24 @@ async function playCard(driver, card) {
     await cardInput.sendKeys(card);
     await driver.sleep(200)
     await submit_card_button.click();
-    console.log("player 2 plays " + card);
+    console.log("player plays " + card);
     await driver.sleep(200)
+}
+
+async function allPlayersParticipate(driver, yes_button, draw_card_button, end_turn_button, discardCards) {
+    for (let card of discardCards) {
+        await playerParticipate(driver, yes_button, draw_card_button, end_turn_button, card)
+    }
+}
+
+async function playerParticipate(driver, yes_button, draw_card_button, end_turn_button, discardCard) {
+    await yes_button.click();
+    await driver.sleep(500)
+    // Player participates, draws card, discards discardCard
+    await draw_card_button.click();
+    await driver.sleep(1000)
+    await playCard(driver, discardCard);
+    await end_turn_button.click();
 }
 
 async function getElementById(driver, id, timeout = 2000) {
