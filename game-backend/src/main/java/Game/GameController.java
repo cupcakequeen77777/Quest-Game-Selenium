@@ -21,11 +21,12 @@ public class GameController {
     @PostMapping("/start")
     public void startGame() {
         game = new Game();
-        distributeCardsForTesting();
+//        distributeCardsForTesting();
 //        game.distributeCards();
+        distributeCardsFor0_winner_quest();
 //        distributeCardsFor2winner_game_2winner_quest();
 //        distributeCardsFor1winner_game_with_events();
-//        distributeCardsFor0_winner_quest();
+//        distributeCardsForA_TEST_JP_Scenario();
     }
 
     public void distributeCardsForTesting() {
