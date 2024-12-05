@@ -23,6 +23,33 @@ function AccessGameState() {
     return game_state
 }
 
+if (location.pathname === "/") {
+    // Add event listener to the Start Game button
+    document.getElementById("start_game_button").addEventListener("click", startGame);
+}
+
+// This function will run when the start-turn page loads
+window.onload = function () {
+    let game_state = Object(AccessGameState())
+    const currentPlayer = game_state["playerTurn"]
+    const currentPlayerHand = game_state["players"][currentPlayer]["hand"]
+
+
+    if (location.pathname === "/start-turn.html") {
+        document.getElementById("player-number").innerText = "Player " + (currentPlayer + 1) + " start your turn";
+        document.getElementById("start_turn_button").addEventListener("click", startTurn);
+
+    }
+    if (location.pathname === "/play-turn.html") {
+        document.getElementById("player-number").innerText = "Player " + (currentPlayer + 1);
+        document.getElementById("player-hand").innerText = currentPlayerHand
+        document.getElementById("draw_card_button").addEventListener("click", drawEventCard);
+        updateShields(game_state)
+        console.log(game_state["eventCard"])
+
+    }
+};
+
 async function startGame() {
     console.log("in startGame")
     try {
@@ -43,156 +70,98 @@ async function startTurn() {
     location.pathname = "play-turn.html";
 }
 
-if (location.pathname === "/") {
-    // Add event listener to the Start Game button
-    document.getElementById("start_game_button").addEventListener("click", startGame);
-}
-
-async function askForParticipation() {
-    console.log("in askForParticipation")
-    await nextPlayer()
+async function startNewTurn() {
+    console.log("in startNewTurn")
     await getGameState()
     let game_state = Object(AccessGameState())
-    let currentPlayer = game_state["currentPlayer"]
-    updatePlayerHand(game_state, currentPlayer)
-    document.getElementById("enter_cards").hidden = true;
+    document.getElementById("card_drawn").innerText = ""
     document.getElementById("start_turn_button").hidden = true;
-    document.getElementById("end_turn_button").hidden = true;
-    document.getElementById("finish_button").hidden = true;
-    document.getElementById("yes_button").hidden = false;
-    document.getElementById("no_button").hidden = false;
-    document.getElementById("draw_card_button").hidden = true;
-    document.getElementById("end_turn_button").removeEventListener("click", askForParticipation);
-    document.getElementById("yes_button").addEventListener("click", acceptQuest);
-    document.getElementById("no_button").addEventListener("click", askNextPlayerForParticipation);
-    document.getElementById("card_drawn").innerText = "Do you want to participate in a quest of " + game_state["quest"]["numStages"] + " stages?"
+    document.getElementById("draw_card_button").hidden = false;
+    document.getElementById("draw_card_button").innerText = "Draw Event Card"
+
+    console.log("Start New Turn")
+    currentPlayer = game_state["currentPlayer"]
+    updatePlayerHand(game_state, currentPlayer)
 }
 
-async function submitAttackForStage() {
-    console.log("in submitAttackForStage")
-    document.getElementById("enter_cards").hidden = true;
-    document.getElementById("submit_card_button").removeEventListener("click", submitAttackForStage);
-    document.getElementById("end_turn_button").hidden = true;
-    document.getElementById("end_turn_button").addEventListener("click", startStages);
+async function drawEventCard() {
+    console.log("in drawEventCard")
+    document.getElementById("draw_card_button").hidden = true;
+    document.getElementById("draw_card_button").removeEventListener("click", drawEventCard);
 
-    let card = await selectCard()
-
-    if (card === "") { // TODO: also check if there is at least one foe card played
-        document.getElementById("enter_cards").hidden = false;
-    } else {
-        let response = await fetch(`${apiBaseUrl}/enter_card_for_attack?card=${card}`);
-        let enteredCard = await response.text();
-        document.getElementById("card_drawn").innerText += "\nYou entered: " + enteredCard
+    try {
+        let response = await fetch(`${apiBaseUrl}/draw_event_card`, {method: "POST"});
+        let result = await response.text();
+        console.log("draw_event_card Response:", result);
         await getGameState()
         let game_state = Object(AccessGameState())
-        updateHand(game_state)
         console.log(game_state)
-        document.getElementById("enter_cards").hidden = false;
-        document.getElementById("finish_button").hidden = false;
-        // document.getElementById("submit_card_button").removeEventListener("click", submitCardForAttack);
-        console.log(game_state["quest"]["currentStage"] + 1)
-        console.log(game_state["quest"]["numStages"])
+        document.getElementById("card_drawn").innerText = "You drew: " + game_state["eventCard"]
+        currentPlayer = game_state["currentPlayer"]
+        switch (game_state["eventCard"]) {
+            case "Plague":
+                await plague() // REMOVE
+                document.getElementById("card_drawn").innerText += "\nYou lose 2 shields"
+                response = await fetch(`${apiBaseUrl}/play_plague_card`, {method: "POST"});
+                result = await response.text();
+                console.log("play_plague_card Response:", result);
+                updateShields(game_state)
+                document.getElementById("end_turn_button").hidden = false;
+                document.getElementById("end_turn_button").addEventListener("click", endTurn);
+                break;
+            case "Queen’s favor":
+                document.getElementById("card_drawn").innerText += "\nDraw 2 adventure cards: "
+                let cards = await queensFavor();
+                document.getElementById("card_drawn").innerText += " " + cards
+                await getGameState()
+                game_state = Object(AccessGameState())
+                updateHand(game_state)
+                await checkNumberCards()
+                break;
+            case "Prosperity": // FIXME: everyone does a queen's favour, then discards extra cards
+                document.getElementById("card_drawn").innerText += "\nEveryone draws 2 cards"
+                // response = fetch(`${apiBaseUrl}/play_prosperity_card`, {method: "POST"});
+                // result = response.text();
+                // console.log("Prosperity Response:", result);
+                // updateHand(game_state)
 
-        // document.getElementById("finish_button").removeEventListener("click", sponsorNextStage);
-        document.getElementById("finish_button").addEventListener("click", startStages);
+                document.getElementById("end_turn_button").hidden = false;
+                document.getElementById("end_turn_button").addEventListener("click", endTurn);
+                break;
+            default:
+                document.getElementById("card_drawn").innerText += "\nDo you want to sponsor the quest?"
+                document.getElementById("no_button").addEventListener("click", declineSponsorship);
+                document.getElementById("yes_button").addEventListener("click", sponsorQuest);
+                document.getElementById("yes_button").hidden = false;
+                document.getElementById("no_button").hidden = false;
+                break;
+        }
+
+        console.log(game_state["players"])
 
 
+    } catch (error) {
+        console.error("Error in draw_event_card:", error);
     }
+
 }
 
-async function startStages() {
-    console.log("in startStages")
-    let newCurrentPlayer = participant.at(-1)
-    participant.pop()
-    console.log("participant: " + participant)
-    await fetch(`${apiBaseUrl}/set_current_player?playerNumber=${parseInt(newCurrentPlayer)}`)
+async function endTurn() {
+    console.log("In endTurn")
+    await nextTurn()
     await getGameState()
     let game_state = Object(AccessGameState())
-    let currentPlayer = game_state["currentPlayer"]
-    let currentStage = game_state["quest"]["currentStage"]
-    let numStages = game_state["quest"]["numStages"]
+    document.getElementById("card_drawn").innerText = "Start of new Turn"
+    document.getElementById("start_turn_button").hidden = false;
+    // document.getElementById("start_turn_button").addEventListener("click", startNewTurn); REMOVE
 
-    console.log("currentPlayer: " + currentPlayer)
-    document.getElementById("enter_cards").hidden = false;
-    document.getElementById("yes_button").hidden = true;
-    document.getElementById("no_button").hidden = true;
     document.getElementById("end_turn_button").hidden = true;
-    document.getElementById("start_turn_button").hidden = true;
+    document.getElementById("end_turn_button").removeEventListener("click", endTurn);
 
-    console.log("Here")
-
-    document.getElementById("submit_card_button").removeEventListener("click", submitCardForStage);
-    document.getElementById("submit_card_button").addEventListener("click", submitAttackForStage);
-    document.getElementById("card_drawn").innerText = "Choose an attack card for stage " + (currentStage + 1) + "/" + numStages
-    updatePlayerHand(game_state, currentPlayer)
-}
-
-async function askNextPlayerForParticipation() {
-    console.log("in askNextPlayerForParticipation")
-    await nextPlayer()
-    await getGameState()
-    let game_state = AccessGameState()
-    document.getElementById("end_turn_button").hidden = true;
-
-
+    document.getElementById("player-hand").innerText = ""
     currentPlayer = game_state["currentPlayer"]
-    let playerTurn = game_state["playerTurn"]
-
-    console.log("playerTurn: " + playerTurn)
-    console.log("currentPlayer: " + currentPlayer)
-
-    if (currentPlayer === playerTurn) {
-        document.getElementById("yes_button").hidden = true;
-        document.getElementById("no_button").hidden = true;
-        document.getElementById("yes_button").removeEventListener("click", acceptQuest);
-        document.getElementById("no_button").removeEventListener("click", askNextPlayerForParticipation);
-        document.getElementById("start_turn_button").removeEventListener("click", startNewTurn);
-        document.getElementById("end_turn_button").removeEventListener("click", askNextPlayerForParticipation);
-        document.getElementById("draw_card_button").hidden = true;
-        document.getElementById("end_turn_button").hidden = true;
-        document.getElementById("start_turn_button").hidden = false;
-        document.getElementById("card_drawn").innerText = ""
-        console.log("Start Quest stages")
-        console.log(game_state["quest"]["stages"][game_state["quest"]["currentStage"]]["participants"])
-        for (let i = 0; i < game_state["quest"]["stages"][game_state["quest"]["currentStage"]]["participants"].length; i++) {
-            participant.push(game_state["quest"]["stages"][game_state["quest"]["currentStage"]]["participants"][i]["playerNumber"] - 1)
-        }
-        participant.reverse()
-        console.log(participant)
-        let newCurrentPlayer = participant.at(-1)
-        await fetch(`${apiBaseUrl}/set_current_player?playerNumber=${parseInt(newCurrentPlayer)}`)
-        // TODO: check this
-        console.log(currentPlayer)
-        document.getElementById("start_turn_button").addEventListener("click", startStages);
-        updatePlayerHand(game_state, newCurrentPlayer)
-    } else {
-        await getGameState()
-        let game_state = AccessGameState()
-        document.getElementById("yes_button").addEventListener("click", acceptQuest);
-        document.getElementById("no_button").addEventListener("click", askNextPlayerForParticipation);
-        document.getElementById("card_drawn").innerText = "Do you want to participate in a quest of " + game_state["quest"]["numStages"] + " stages?"
-        document.getElementById("yes_button").hidden = false;
-        document.getElementById("no_button").hidden = false;
-        currentPlayer = game_state["currentPlayer"]
-        updatePlayerHand(game_state, currentPlayer)
-    }
-
+    document.getElementById("player-number").innerText = "Player " + (currentPlayer + 1) + " start your turn";
 }
-
-async function acceptQuest() {
-    console.log("in acceptQuest")
-    let response = await fetch(`${apiBaseUrl}/accept_quest`, {method: "POST"});
-    const nextPlayer = await response.text();
-    console.log("accept_quest Response:", nextPlayer);
-    document.getElementById("draw_card_button").hidden = false;
-    document.getElementById("draw_card_button").addEventListener("click", drawAdventureCard);
-    document.getElementById("draw_card_button").removeEventListener("click", drawEventCard);
-    document.getElementById("yes_button").hidden = true;
-    document.getElementById("no_button").hidden = true;
-    // FIXME: need to draw a card and update the hand
-
-}
-
 
 async function declineSponsorship() {
     console.log("in declineSponsorship")
@@ -211,6 +180,8 @@ async function declineSponsorship() {
     if (currentPlayer === playerTurn) {
         document.getElementById("yes_button").hidden = true;
         document.getElementById("no_button").hidden = true;
+        document.getElementById("no_button").removeEventListener("click", declineSponsorship);
+        document.getElementById("yes_button").removeEventListener("click", sponsorQuest);
         document.getElementById("draw_card_button").hidden = true;
         document.getElementById("end_turn_button").hidden = false;
         document.getElementById("card_drawn").innerText = ""
@@ -225,6 +196,54 @@ async function declineSponsorship() {
         updatePlayerHand(game_state, currentPlayer)
     }
 
+}
+
+async function sponsorQuest() {
+    console.log("in sponsorQuest")
+    let response = await fetch(`${apiBaseUrl}/sponsor_quest`, {method: "POST"});
+    // TODO: check if player can sponsor quest otherwise put up end turn button and response saying they can't sponsor
+
+    let quest = AccessGameState()["quest"]
+    console.log(quest)
+    let currentStage = quest["currentStage"]
+    let numStages = quest["numStages"]
+
+    document.getElementById("card_drawn").innerText = "Sponsor, choose a card for stage " + (currentStage + 1) + "/" + numStages
+    document.getElementById("enter_cards").hidden = false;
+    document.getElementById("yes_button").hidden = true;
+    document.getElementById("no_button").hidden = true;
+    document.getElementById("no_button").removeEventListener("click", declineSponsorship);
+    document.getElementById("yes_button").removeEventListener("click", sponsorQuest);
+    document.getElementById("submit_card_button").addEventListener("click", submitCardForStage);
+}
+
+async function submitCardForStage() {
+    // DONE: how function to handle selection of cards and validation, returns the card selected
+    console.log("in submitCardForStage")
+    let card = await selectCard()
+
+    if (card === "") { // TODO: also check if there is at least one foe card played
+        document.getElementById("enter_cards").hidden = false;
+    } else {
+        let response = await fetch(`${apiBaseUrl}/enter_card_for_stage?card=${card}`);
+        let enteredCard = await response.text();
+        document.getElementById("card_drawn").innerText += "\nYou entered: " + enteredCard
+        await getGameState()
+        let game_state = Object(AccessGameState())
+        currentPlayer = game_state["currentPlayer"]
+        console.log("Current Player: " + currentPlayer)
+        updatePlayerHand(game_state, currentPlayer)
+        document.getElementById("enter_cards").hidden = false;
+        document.getElementById("finish_button").hidden = false;
+        if (game_state["quest"]["currentStage"] + 1 === game_state["quest"]["numStages"]) {
+            await fetch(`${apiBaseUrl}/reset_current_stage`, {method: "POST"});
+            document.getElementById("finish_button").addEventListener("click", finishSponsorStage);
+        } else {
+            document.getElementById("finish_button").addEventListener("click", sponsorNextStage);
+
+        }
+
+    }
 }
 
 async function sponsorNextStage() {
@@ -252,109 +271,229 @@ async function sponsorNextStage() {
 
 }
 
-async function sponsorQuest() {
-    console.log("in sponsorQuest")
-    let response = await fetch(`${apiBaseUrl}/sponsor_quest`, {method: "POST"});
-    // TODO: check if player can sponsor quest otherwise put up end turn button and response saying they can't sponsor
+function finishSponsorStage() {
+    console.log("in finishSponsorStage")
+    document.getElementById("card_drawn").innerText = "You have sponsored all stages"
+    document.getElementById("enter_cards").hidden = true;
+    document.getElementById("finish_button").hidden = true;
+    document.getElementById("end_turn_button").hidden = false;
+    document.getElementById("finish_button").removeEventListener("click", finishSponsorStage);
+    document.getElementById("finish_button").removeEventListener("click", sponsorNextStage);
+    document.getElementById("submit_card_button").removeEventListener("click", submitCardForStage);
+    document.getElementById("end_turn_button").removeEventListener("click", endTurn);
+    document.getElementById("end_turn_button").addEventListener("click", askForParticipation);
+}
+
+
+async function askForParticipation() {
+    console.log("in askForParticipation")
+    await nextPlayer()
+    await getGameState()
+    let game_state = Object(AccessGameState())
+    let currentPlayer = game_state["currentPlayer"]
+    updatePlayerHand(game_state, currentPlayer)
+    document.getElementById("enter_cards").hidden = true;
+    document.getElementById("start_turn_button").hidden = true;
     document.getElementById("end_turn_button").hidden = true;
+    document.getElementById("finish_button").hidden = true;
+    document.getElementById("yes_button").hidden = false;
+    document.getElementById("no_button").hidden = false;
+    document.getElementById("draw_card_button").hidden = true;
+    document.getElementById("end_turn_button").removeEventListener("click", askForParticipation);
+    document.getElementById("yes_button").addEventListener("click", acceptQuest);
+    document.getElementById("no_button").addEventListener("click", askNextPlayerForParticipation);
+    document.getElementById("card_drawn").innerText = "Do you want to participate in a quest of " + game_state["quest"]["numStages"] + " stages?"
+}
+
+async function acceptQuest() {
+    console.log("in acceptQuest")
+    let response = await fetch(`${apiBaseUrl}/accept_quest`, {method: "POST"});
+    const nextPlayer = await response.text();
+    console.log("accept_quest Response:", nextPlayer);
+    document.getElementById("draw_card_button").hidden = false;
+    document.getElementById("draw_card_button").innerText = "Draw Adventure Card"
+    document.getElementById("draw_card_button").addEventListener("click", drawAdventureCard);
     document.getElementById("yes_button").hidden = true;
     document.getElementById("no_button").hidden = true;
-    document.getElementById("no_button").removeEventListener("click", declineSponsorship);
-    document.getElementById("yes_button").removeEventListener("click", sponsorQuest);
-
-    let quest = AccessGameState()["quest"]
-    console.log(quest)
-    let currentStage = quest["currentStage"]
-    let numStages = quest["numStages"]
-
-    document.getElementById("card_drawn").innerText = "Sponsor, choose a card for stage " + (currentStage + 1) + "/" + numStages
-    document.getElementById("enter_cards").hidden = false;
-    document.getElementById("submit_card_button").addEventListener("click", submitCardForStage);
-    document.getElementById("finish_button").addEventListener("click", sponsorNextStage);
+    document.getElementById("yes_button").removeEventListener("click", acceptQuest);
+    document.getElementById("no_button").removeEventListener("click", askNextPlayerForParticipation);
 
 }
 
-async function drawEventCard() {
-    console.log("in drawEventCard")
+async function drawAdventureCard() {
+    console.log("in drawAdventureCard")
+    let card = "";
     document.getElementById("draw_card_button").hidden = true;
+    document.getElementById("draw_card_button").removeEventListener("click", drawAdventureCard);
+
+    document.getElementById("end_turn_button").hidden = true;
+    document.getElementById("end_turn_button").removeEventListener("click", askForParticipation);
+
+    document.getElementById("draw_card_button").innerText = "Draw !!!! Card"
+
 
     try {
-        let response = await fetch(`${apiBaseUrl}/draw_event_card`, {method: "POST"});
-        let result = await response.text();
-        console.log("draw_event_card Response:", result);
-        await getGameState()
-        let game_state = Object(AccessGameState())
-        console.log(game_state)
-        document.getElementById("card_drawn").innerText = "You drew: " + game_state["eventCard"]
-        currentPlayer = game_state["currentPlayer"]
-        switch (game_state["eventCard"]) {
-            case "Plague":
-                await plague()
-                document.getElementById("card_drawn").innerText += "\nYou lose 2 shields"
-                response = await fetch(`${apiBaseUrl}/play_plague_card`, {method: "POST"});
-                result = await response.text();
-                console.log("play_plague_card Response:", result);
-                updateShields(game_state)
-                document.getElementById("end_turn_button").hidden = false;
-                break;
-            case "Queen’s favor":
-                document.getElementById("card_drawn").innerText += "\nDraw 2 adventure cards: "
-                let cards = await queensFavor();
-                document.getElementById("card_drawn").innerText += " " + cards
-                await getGameState()
-                game_state = Object(AccessGameState())
-                updateHand(game_state)
-                await checkNumberCards()
-                break;
-            case "Prosperity": // FIXME: everyone does a queen's favour, then discards extra cards
-                document.getElementById("card_drawn").innerText += "\nEveryone draws 2 cards"
-                // response = fetch(`${apiBaseUrl}/play_prosperity_card`, {method: "POST"});
-                // result = response.text();
-                // console.log("Prosperity Response:", result);
-                // updateHand(game_state)
+        const response = await fetch(`${apiBaseUrl}/draw_adventure_card`, {method: "POST"});
+        card = await response.text();
 
-                document.getElementById("end_turn_button").hidden = false;
-                break;
-            default:
-                document.getElementById("card_drawn").innerText += "\nDo you want to sponsor the quest?"
-                document.getElementById("no_button").addEventListener("click", declineSponsorship);
-                document.getElementById("yes_button").addEventListener("click", sponsorQuest);
-                document.getElementById("yes_button").hidden = false;
-                document.getElementById("no_button").hidden = false;
-                break;
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`); // Handle non-2xx responses
         }
 
-        console.log(game_state["players"])
+        console.log("draw_adventure_card Response:", card);
+        document.getElementById("card_drawn").innerText = "You drew: " + card
+        await getGameState()
+        let game_state = AccessGameState()
+        currentPlayer = game_state["currentPlayer"]
+        updatePlayerHand(game_state, currentPlayer)
+        await checkNumberCards();
+        document.getElementById("end_turn_button").addEventListener("click", askNextPlayerForParticipation);
 
     } catch (error) {
-        console.error("Error in draw_event_card:", error);
+        console.error("Error in draw_adventure_card:", error);
+        card = ""; // or handle the error appropriately
+    }
+    return card;
+}
+
+async function askNextPlayerForParticipation() {
+    console.log("in askNextPlayerForParticipation")
+    await nextPlayer()
+    await getGameState()
+    let game_state = AccessGameState()
+    document.getElementById("end_turn_button").hidden = true;
+
+
+    currentPlayer = game_state["currentPlayer"]
+    let playerTurn = game_state["playerTurn"]
+
+    console.log("playerTurn: " + playerTurn)
+    console.log("currentPlayer: " + currentPlayer)
+
+    if (currentPlayer === playerTurn) {
+        document.getElementById("yes_button").hidden = true;
+        document.getElementById("no_button").hidden = true;
+        document.getElementById("yes_button").removeEventListener("click", acceptQuest);
+        document.getElementById("no_button").removeEventListener("click", askNextPlayerForParticipation);
+        document.getElementById("start_turn_button").removeEventListener("click", startNewTurn);
+        document.getElementById("end_turn_button").removeEventListener("click", askNextPlayerForParticipation);
+
+        document.getElementById("draw_card_button").hidden = true;
+        document.getElementById("end_turn_button").hidden = true;
+        document.getElementById("start_turn_button").hidden = false;
+        document.getElementById("card_drawn").innerText = ""
+        console.log("Start Quest stages")
+        console.log(game_state["quest"]["stages"][game_state["quest"]["currentStage"]]["participants"])
+        for (let i = 0; i < game_state["quest"]["stages"][game_state["quest"]["currentStage"]]["participants"].length; i++) {
+            participant.push(game_state["quest"]["stages"][game_state["quest"]["currentStage"]]["participants"][i]["playerNumber"] - 1)
+        }
+        participant.reverse()
+        console.log(participant)
+        let newCurrentPlayer = participant.at(-1)
+        await fetch(`${apiBaseUrl}/set_current_player?playerNumber=${parseInt(newCurrentPlayer)}`)
+        // TODO: check this
+        console.log(currentPlayer)
+        document.getElementById("start_turn_button").addEventListener("click", startAttackStages);
+        updatePlayerHand(game_state, newCurrentPlayer)
+    } else {
+        await getGameState()
+        let game_state = AccessGameState()
+        document.getElementById("yes_button").addEventListener("click", acceptQuest);
+        document.getElementById("no_button").addEventListener("click", askNextPlayerForParticipation);
+        document.getElementById("end_turn_button").removeEventListener("click", askNextPlayerForParticipation);
+
+        document.getElementById("card_drawn").innerText = "Do you want to participate in a quest of " + game_state["quest"]["numStages"] + " stages?"
+        document.getElementById("yes_button").hidden = false;
+        document.getElementById("no_button").hidden = false;
+        currentPlayer = game_state["currentPlayer"]
+        updatePlayerHand(game_state, currentPlayer)
     }
 
 }
 
-async function startNewTurn() {
-    console.log("in startNewTurn")
-    await getGameState()
-    let game_state = Object(AccessGameState())
-    document.getElementById("card_drawn").innerText = ""
-    document.getElementById("start_turn_button").hidden = true;
-    document.getElementById("draw_card_button").hidden = false;
-    console.log("Start New Turn")
-    currentPlayer = game_state["currentPlayer"]
-    updatePlayerHand(game_state, currentPlayer)
+async function startAttackStages() {
+    console.log("in startAttackStages")
+    if (participant.length === 0) {
+        document.getElementById("enter_cards").hidden = true;
+        document.getElementById("submit_card_button").removeEventListener("click", submitAttackForStage);
+        document.getElementById("finish_button").removeEventListener("click", startAttackStages);
+        document.getElementById("submit_card_button").removeEventListener("click", submitAttackForStage);
+
+        console.log("This Stage attack complete, end turn button should be displayed")
+        document.getElementById("end_turn_button").hidden = false;
+        document.getElementById("end_turn_button").addEventListener("click", finishAnAttackStage);
+
+
+    } else {
+        let newCurrentPlayer = participant.at(-1)
+        participant.pop()
+        console.log("participant: " + participant)
+        await fetch(`${apiBaseUrl}/set_current_player?playerNumber=${parseInt(newCurrentPlayer)}`)
+        await getGameState()
+        let game_state = Object(AccessGameState())
+        let currentPlayer = game_state["currentPlayer"]
+        let currentStage = game_state["quest"]["currentStage"]
+        let numStages = game_state["quest"]["numStages"]
+
+        console.log("currentPlayer: " + currentPlayer)
+        document.getElementById("enter_cards").hidden = false;
+        document.getElementById("finish_button").hidden = false;
+        document.getElementById("yes_button").hidden = true;
+        document.getElementById("no_button").hidden = true;
+        document.getElementById("start_turn_button").hidden = true;
+        document.getElementById("start_turn_button").removeEventListener("click", startAttackStages);
+
+        document.getElementById("submit_card_button").addEventListener("click", submitAttackForStage);
+        document.getElementById("finish_button").addEventListener("click", startAttackStages);
+        document.getElementById("card_drawn").innerText = "Choose an attack card for stage " + (currentStage + 1) + "/" + numStages
+        updatePlayerHand(game_state, currentPlayer)
+    }
 }
 
-async function endTurn() {
-    console.log("In endTurn")
-    await nextTurn()
+async function submitAttackForStage() {
+    console.log("in submitAttackForStage")
+    document.getElementById("enter_cards").hidden = false;
+    document.getElementById("finish_button").hidden = false;
+
+    let card = await selectCard()
+    if (card !== "") {
+        let response = await fetch(`${apiBaseUrl}/enter_card_for_attack?card=${card}`);
+        let enteredCard = await response.text();
+        document.getElementById("card_drawn").innerText += "\nYou entered: " + enteredCard
+        await getGameState()
+        let game_state = Object(AccessGameState())
+        currentPlayer = game_state["currentPlayer"]
+        updatePlayerHand(game_state, currentPlayer)
+        document.getElementById("finish_button").addEventListener("click", startAttackStages);
+    }
+}
+
+// TODO: FIXME: finishAnAttackStage
+async function finishAnAttackStage() {
+    console.log("in finishAnAttackStage")
+    let response = await fetch(`${apiBaseUrl}/resolve_stage_attack`, {method: "POST"});
+    let successfulParticipants = await response.text();
+    console.log("Participants:", successfulParticipants);
     await getGameState()
     let game_state = Object(AccessGameState())
-    document.getElementById("card_drawn").innerText = "Start of new Turn"
-    document.getElementById("start_turn_button").hidden = false;
-    document.getElementById("end_turn_button").hidden = true;
-    document.getElementById("player-hand").innerText = ""
-    currentPlayer = game_state["currentPlayer"]
-    document.getElementById("player-number").innerText = "Player " + (currentPlayer + 1) + " start your turn";
+    response = await fetch(`${apiBaseUrl}/resolve_quest`, {method: "POST"});
+    let result = await response.text();
+    console.log("resolve_quest Response:", result);
+    if (game_state["quest"]["currentStage"] + 1 === game_state["quest"]["numStages"]) {
+        // resolveQuest
+        console.log("Quest is resolved")
+
+
+    }
+    // if all players failed quest, end quest
+    if(successfulParticipants === "[]"){
+        console.log("All players failed quest")
+        // end quest
+    }
+
+    // Move to next stage
+
+
 }
 
 async function nextTurn() {
@@ -396,37 +535,6 @@ async function queensFavor() {
     }
     console.log("Queen’s favor: ", cards);
     return cards;
-}
-
-async function drawAdventureCard() {
-    console.log("in drawAdventureCard")
-    let card = "";
-    document.getElementById("draw_card_button").hidden = true;
-    document.getElementById("end_turn_button").hidden = true;
-
-
-    try {
-        const response = await fetch(`${apiBaseUrl}/draw_adventure_card`, {method: "POST"});
-        card = await response.text();
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`); // Handle non-2xx responses
-        }
-
-        console.log("draw_adventure_card Response:", card);
-        document.getElementById("card_drawn").innerText = "You drew: " + card
-        await getGameState()
-        let game_state = AccessGameState()
-        currentPlayer = game_state["currentPlayer"]
-        updatePlayerHand(game_state, currentPlayer)
-        await checkNumberCards();
-        document.getElementById("end_turn_button").addEventListener("click", askNextPlayerForParticipation);
-
-    } catch (error) {
-        console.error("Error in draw_adventure_card:", error);
-        card = ""; // or handle the error appropriately
-    }
-    return card;
 }
 
 function updateShields(game_state) {
@@ -524,78 +632,7 @@ async function submitCardForDiscard() {
 
 }
 
-function finishStage() {
-    console.log("in finishStage")
-    document.getElementById("card_drawn").innerText = "You have sponsored all stages"
-    document.getElementById("enter_cards").hidden = true;
-    document.getElementById("finish_button").hidden = true;
-    document.getElementById("end_turn_button").hidden = false;
-    document.getElementById("end_turn_button").removeEventListener("click", endTurn);
-    document.getElementById("end_turn_button").addEventListener("click", askForParticipation);
-    document.getElementById("finish_button").removeEventListener("click", sponsorNextStage);
-    document.getElementById("submit_card_button").removeEventListener("click", submitCardForStage); // NOTE
 
-}
-
-async function submitCardForStage() {
-    // DONE: how function to handle selection of cards and validation, returns the card selected
-    console.log("in submitCardForStage")
-    let card = await selectCard()
-
-    if (card === "") { // TODO: also check if there is at least one foe card played
-        document.getElementById("enter_cards").hidden = false;
-    } else {
-        let response = await fetch(`${apiBaseUrl}/enter_card_for_stage?card=${card}`);
-        let enteredCard = await response.text();
-        document.getElementById("card_drawn").innerText += "\nYou entered: " + enteredCard
-        await getGameState()
-        let game_state = Object(AccessGameState())
-        updateHand(game_state)
-        document.getElementById("enter_cards").hidden = false;
-        document.getElementById("finish_button").hidden = false;
-        console.log(game_state["quest"]["currentStage"] + 1)
-        console.log(game_state["quest"]["numStages"])
-        if (game_state["quest"]["currentStage"] + 1 === game_state["quest"]["numStages"]) {
-            await fetch(`${apiBaseUrl}/reset_current_stage`, {method: "POST"});
-            document.getElementById("finish_button").addEventListener("click", finishStage);
-        } else {
-            document.getElementById("finish_button").addEventListener("click", sponsorNextStage);
-
-        }
-
-    }
-
-
-}
-
-// This function will run when the start-turn page loads
-window.onload = function () {
-    let game_state = Object(AccessGameState())
-    const currentPlayer = game_state["playerTurn"]
-    const currentPlayerHand = game_state["players"][currentPlayer]["hand"]
-
-
-    if (location.pathname === "/start-turn.html") {
-        document.getElementById("player-number").innerText = "Player " + (currentPlayer + 1) + " start your turn";
-        document.getElementById("start_turn_button").addEventListener("click", startTurn);
-
-    }
-    if (location.pathname === "/play-turn.html") {
-        document.getElementById("player-number").innerText = "Player " + (currentPlayer + 1);
-        document.getElementById("player-hand").innerText = currentPlayerHand
-        document.getElementById("draw_card_button").addEventListener("click", drawEventCard);
-        document.getElementById("no_button").addEventListener("click", declineSponsorship);
-        document.getElementById("yes_button").addEventListener("click", sponsorQuest);
-        document.getElementById("end_turn_button").addEventListener("click", endTurn);
-        document.getElementById("start_turn_button").addEventListener("click", startNewTurn);
-        updateShields(game_state)
-        console.log(game_state["eventCard"])
-
-    }
-};
-
-
-// console.table(listAllEventListeners()); // NOTE: uncomment to see all event listeners
 function listAllEventListeners() {
     const allElements = document.querySelectorAll('*');
     const elements = [];
@@ -617,7 +654,7 @@ function listAllEventListeners() {
     return elements;
 }
 
-
+// console.table(listAllEventListeners()); // NOTE: uncomment to see all event listeners
 
 
 // {

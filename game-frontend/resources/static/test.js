@@ -1,6 +1,13 @@
 const {Builder, By, until, added} = require('selenium-webdriver');
 const assert = require("node:assert");
 
+async function checkCurrentPlayer(p, driver) {
+    let playerNumber = await getElementById(driver, 'player-number')
+    let playerNumberText = (await playerNumber.getText())
+    assert(playerNumberText.includes(p), "Incorrect player being displayed is \"" + playerNumberText + "\" should be " + "\""+ p + "\"");
+    return playerNumber;
+}
+
 async function scenario_0_winner_quest() {
     let driver = await new Builder().forBrowser('chrome').build();
 
@@ -15,20 +22,20 @@ async function scenario_0_winner_quest() {
         assert((await playerNumber.getText()).includes("start your turn"), "Player number is not displayed correctly");
         console.log("Game started successfully.");
 
-        let startTurnButton = await getElementById(driver, 'start_turn_button');
-        await startTurnButton.click();
+
+        await pressButton(driver, 'start_turn_button');
         console.log("Turn started successfully.");
         await driver.sleep(500)
 
         let draw_card_button = await getElementById(driver, 'draw_card_button');
         // TODO: change text on draw event card to draw adventure card
 
-        // PP1 draws a 2 stage quest and decides to sponsor it.
+        // P1 draws a 2 stage quest and decides to sponsor it.
         await drawEventCard(driver, draw_card_button);
 
         // NOTE: player 1 choose to sponsor quest
-        let yes_button = await getElementById(driver, 'yes_button');
-        await yes_button.click();
+        await pressButton(driver, 'yes_button');
+
         console.log("player 1 choose to sponsor quest");
         await driver.sleep(1000)
 
@@ -38,27 +45,46 @@ async function scenario_0_winner_quest() {
         // Player 1 enters cards to sponsor quest stage 2
         await playCards(driver, ["F70", "dagger", "sword", "horse", "axe", "lance"]);
         // TODO: the player card area is still there, need to remove it
-        let end_turn_button = await getElementById(driver, 'end_turn_button');
-        await end_turn_button.click();
-        await driver.sleep(1000)
+        await checkCurrentPlayer("Player 1", driver);
+
+        await pressButton(driver, 'end_turn_button');
+
 
         // P2 participates, draws 1xF5, discards F5
         // P3 participates, draws 1xF15, discards F15
         // P4 participates, draws 1xF10, discards F10
-        await allPlayersParticipate(driver, yes_button, draw_card_button, end_turn_button, ["F5", "F15", "F10"]);
+        await allPlayersParticipate(driver, ["F5", "F15", "F10"]);
 
         // P2 attack: Excalibur thus loses
         // P3 plays nothing as attack and thus loses
         // P4 plays nothing as attack and thus loses
-        startTurnButton = await getElementById(driver, 'start_turn_button');
-        await startTurnButton.click();
+        await pressButton(driver, 'start_turn_button');
         console.log("Turn started successfully.");
         await driver.sleep(500)
         await playCard(driver, "Excalibur");
         console.log("player 2 plays Excalibur");
 
+        await pressButton(driver, 'finish_button');
+        console.log("player 2 finishes turn");
 
-        await driver.sleep(100000)
+        await pressButton(driver, 'finish_button')
+        console.log("player 3 finishes turn");
+
+        await pressButton(driver, 'finish_button')
+        console.log("player 4 finishes turn");
+
+        await pressButton(driver, 'end_turn_button');
+
+
+        // The quest ends with no winner but P1 does discards 12 quests cards
+        // • P1 draws 14 cards: 1xF5, 1xF10, 1xF15,  4 daggers, 4 horses, 3 swords
+        // • P1 discards 1xF5, 1x10
+        // • P1’s hand: 1xF15,  4 daggers, 4 horses, 3 swords
+        // • P2 has 2xF5, 1xF10, 2xF15, 2xF20, 1xF25, 2xF30, 1xF40
+        // • P3 and P4 have their initial hands
+
+        console.log("test completed");
+        // await driver.sleep(100000)
 
 
         // await driver.wait(until.elementTextContains(driver.findElement(By.id('game-status')), 'Game started'), 10000);
@@ -351,7 +377,7 @@ async function scenario_A_TEST_JP() {
         await driver.sleep(100000)
 
 
-        // TODO:
+        // FIXME: when going from player 2 sponsoring, after player 2 adds a card it is showing player 1's turn
         // P2 attack: Dagger + Sword => value of 15
 
         // P3 attack: Sword + Dagger => value of 15
@@ -362,8 +388,6 @@ async function scenario_A_TEST_JP() {
         await driver.sleep(500)
         await playCard(driver, "Dagger");
         console.log("player 2 plays Excalibur");
-
-
 
 
         await driver.sleep(100000)
@@ -429,23 +453,37 @@ async function playCard(driver, card) {
     await driver.sleep(200)
 }
 
-async function allPlayersParticipate(driver, yes_button, draw_card_button, end_turn_button, discardCards) {
+async function allPlayersParticipate(driver, discardCards) {
     for (let card of discardCards) {
-        await playerParticipate(driver, yes_button, draw_card_button, end_turn_button, card)
+        await playerParticipate(driver, card)
     }
 }
 
-async function playerParticipate(driver, yes_button, draw_card_button, end_turn_button, discardCard) {
-    await yes_button.click();
-    await driver.sleep(2000)
+async function playerParticipate(driver, discardCard) {
+    let playerNumber = await getElementById(driver, 'player-number')
+    assert((await playerNumber.getText()).includes("Player"), "Player number is not displayed correctly");
+    console.log("Game started successfully.");
+
+
+    await getElementById(driver, 'participate_button').inner;
+    console.log("player chooses to participates");
+    await pressButton(driver, 'yes_button');
     // Player participates, draws card, discards discardCard
-    await draw_card_button.click();
-    await driver.sleep(2000)
+    await pressButton(driver, 'draw_card_button');
     await playCard(driver, discardCard);
-    await end_turn_button.click();
+    await driver.sleep(500)
+    console.log("player discards " + discardCard);
+    await pressButton(driver, 'end_turn_button');
+    console.log("player ends turn");
 }
 
-async function getElementById(driver, id, timeout = 2000) {
+async function pressButton(driver, buttonId) {
+    let button = await getElementById(driver, buttonId);
+    await button.click();
+    await driver.sleep(500)
+}
+
+async function getElementById(driver, id, timeout = 100000) {
     const el = await driver.wait(until.elementLocated(By.id(id)), timeout);
     return await driver.wait(until.elementIsVisible(el), timeout);
 }
