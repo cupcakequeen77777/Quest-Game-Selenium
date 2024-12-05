@@ -282,23 +282,37 @@ public class GameController {
     }
 
     @GetMapping("/enter_card_for_attack")
-    public boolean enter_card_for_attack(@RequestParam(name = "card", required = false, defaultValue = "F0") String card) {
+    public String enter_card_for_attack(@RequestParam(name = "card", required = false, defaultValue = "F0") String card) {
         Card newCard = new Card(card, Card.CardType.ADVENTURE);
         Player player = game.players.get(game.currentPlayer);
         if (!player.isValidAttackCard(newCard)) {
-            return false;
+            return "";
         }
         System.out.println("enter_card_for_attack card: " + newCard);
         player.attack.add(newCard);
         player.hand.removeCard(newCard);
         player.calculateAttackValue();
-        return true;
+        return newCard.toString();
     }
 
     @GetMapping("/set_current_player")
     public boolean set_current_player(@RequestParam(name = "playerNumber", required = false, defaultValue = "0") int playerNumber) {
         game.currentPlayer = playerNumber;
         return false;
+    }
+
+    @PostMapping("/resolve_stage_attack")
+    public String resolve_stage_attack() {
+        System.out.println("resolve_stage_attack");
+        System.out.println(game.quest.currentStage);
+        return game.resolveStageAttack() + "";
+    }
+
+    @PostMapping("/resolve_quest")
+    public String resolve_quest() {
+        System.out.println("resolve_quest");
+        System.out.println(game.quest.currentStage);
+        return game.resolveQuest();
     }
 
 
