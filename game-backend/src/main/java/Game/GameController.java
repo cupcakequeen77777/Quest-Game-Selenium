@@ -1,7 +1,5 @@
 package Game;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -10,7 +8,6 @@ import java.util.*;
 @CrossOrigin(origins = "http://127.0.0.1:8080")
 public class GameController {
 
-    private static final Logger log = LoggerFactory.getLogger(GameController.class);
     Game game;
 
     public GameController() {
@@ -21,12 +18,32 @@ public class GameController {
     @PostMapping("/start")
     public void startGame() {
         game = new Game();
-//        distributeCardsForTesting();
-//        game.distributeCards();
+        game.distributeCards();
+        // distributeCardsForTesting();
+    }
+
+    @PostMapping("/start_2winner_game_2winner_quest")
+    public void start_2winner_game_2winner_quest() {
+        game = new Game();
+        distributeCardsFor2winner_game_2winner_quest();
+    }
+
+    @PostMapping("/start_1winner_game_with_events")
+    public void start_1winner_game_with_events() {
+        game = new Game();
+        distributeCardsFor1winner_game_with_events();
+    }
+
+    @PostMapping("/start_0_winner_quest")
+    public void start_0_winner_quest() {
+        game = new Game();
         distributeCardsFor0_winner_quest();
-//        distributeCardsFor2winner_game_2winner_quest();
-//        distributeCardsFor1winner_game_with_events();
-//        distributeCardsForA_TEST_JP_Scenario();
+    }
+
+    @PostMapping("/start_A_TEST_JP")
+    public void start_A_TEST_JP() {
+        game = new Game();
+        distributeCardsForA_TEST_JP_Scenario();
     }
 
     public void distributeCardsForTesting() {
@@ -298,6 +315,7 @@ public class GameController {
     @GetMapping("/set_current_player")
     public boolean set_current_player(@RequestParam(name = "playerNumber", required = false, defaultValue = "0") int playerNumber) {
         game.currentPlayer = playerNumber;
+        System.out.println("Setting current player: " + playerNumber);
         return false;
     }
 
@@ -306,6 +324,11 @@ public class GameController {
         System.out.println("resolve_stage_attack");
         System.out.println(game.quest.currentStage);
         return game.resolveStageAttack() + "";
+    }
+
+    @GetMapping("/get_sponsor")
+    public int get_sponsor() {
+        return game.quest.sponsor.playerNumber;
     }
 
     @PostMapping("/resolve_quest")

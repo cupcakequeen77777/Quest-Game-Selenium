@@ -551,6 +551,7 @@ public class Game {
 
     public ArrayList<Integer> resolveStageAttack() {
         ArrayList<Integer> participants = new ArrayList<>();
+        System.out.println(quest); // REMOVE
         for (int i = 0; i < quest.stages.get(quest.currentStage).participants.size(); i++) {
             Player participant = quest.stages.get(quest.currentStage).participants.get(i);
             // participants with an attack equal or greater to the value of the current stage are eligible for the next stage
@@ -575,6 +576,7 @@ public class Game {
     }
 
     public String resolveQuest() {
+        Player sponsor = quest.sponsor;
         if (quest.numStages - 1 == quest.currentStage || successfulParticipants.isEmpty()) {
             print("Quest completed by players: " + successfulParticipants + "\n");
             // draws the same number of cards + the number of stages, and then possibly trims their hand
