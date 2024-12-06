@@ -37,3 +37,6 @@ build/
 ### Mac OS ###
 .DS_Store
 src/test/java/JPScenario.java
+.idea/runConfigurations/GameApplication.xml
+/game-frontend/node_modules/
+/game-frontend

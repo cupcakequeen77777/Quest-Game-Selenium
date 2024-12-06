@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quest Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="shortcut icon" href="#">
+</head>
+<body>
+<div class="flex-container">
+    <div id="info" class="container">
+        <div id="player-number"></div>
+        <button id="draw_card_button">Draw Event Card</button>
+        <button id="yes_button" hidden>Yes</button>
+        <button id="no_button" hidden>No</button>
+        <button id="end_turn_button" hidden>End Turn</button>
+        <button id="start_turn_button" hidden>Start Turn</button>
+        <div id="enter_cards" hidden>
+            <label for="cardInput">Enter a card: </label>
+            <input type="text" name="card" id="cardInput" required autocapitalize="characters"/>
+            <button id="submit_card_button">Submit</button>
+            <button id="finish_button" hidden>Finish</button>
+        </div>
+        <div id="player-hand"></div>
+    </div>
+    <div id="play_area" class="container">
+        <div id="card_drawn"></div>
+        <div id="all-player-hands" hidden>
+            <div id="player1-hand"></div>
+            <div id="player2-hand"></div>
+            <div id="player3-hand"></div>
+            <div id="player4-hand"></div>
+        </div>
+    </div>
+    <div id="scores-container">
+        <div id="scores">
+            <div id="player1" class="player">Player 1</div>
+            <div id="player1-score" class="player-score">-</div>
+            <div id="player2" class="player">Player 2</div>
+            <div id="player2-score" class="player-score">-</div>
+            <div id="player3" class="player">Player 3</div>
+            <div id="player3-score" class="player-score">-</div>
+            <div id="player4" class="player">Player 4</div>
+            <div id="player4-score" class="player-score">-</div>
+        </div>
+    </div>
+    <button class = "scenarios" id="restart_button">Restart</button>
+</div>
+<script src="new-Game.js"></script>
+</body>
+</html>
