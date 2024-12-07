@@ -258,7 +258,6 @@ public class GameController {
     @GetMapping("/enter_card_for_stage")
     public String enter_card_for_stage(@RequestParam(name = "card", required = false, defaultValue = "F0") String card) {
         Card newCard = new Card(card, Card.CardType.ADVENTURE);
-        System.out.println("enter_card_for_stage card: " + newCard);
         game.players.get(game.currentPlayer).hand.removeCard(newCard);
         if (newCard.isFoe()) {
             game.quest.stages.get(game.quest.currentStage).foeCard = newCard;
@@ -278,7 +277,6 @@ public class GameController {
             System.out.println("Quest stages: " + game.quest.stages.size());
             return true;
         }
-
         return false;
     }
 
@@ -290,11 +288,28 @@ public class GameController {
         return true;
     }
 
+    @GetMapping("/reset_current_participants")
+    public boolean reset_current_participants() {
+        game.quest.stages.get(game.quest.currentStage).participants.clear();
+        return true;
+    }
+
     @PostMapping("/accept_quest")
     public boolean accept_quest() {
         System.out.println("Accepting quest");
-        System.out.println(game.quest.currentStage);
+        System.out.println("Current Stage " + game.quest.currentStage);
+        System.out.println("Current participants: " + game.quest.stages.get(game.quest.currentStage).participants); // REMOVE
+        if (game.quest.stages.get(game.quest.currentStage).participants.contains(game.players.get(game.currentPlayer))) {
+            return false;
+        }
         game.quest.stages.get(game.quest.currentStage).participants.add(game.players.get(game.currentPlayer));
+        System.out.println("Current participants: " + game.quest.stages.get(game.quest.currentStage).participants); // REMOVE
+        return true;
+    }
+
+    @PostMapping("/decline_quest")
+    public boolean decline_quest() {
+        game.currentPlayer = game.nextPlayer();
         return true;
     }
 
@@ -309,6 +324,7 @@ public class GameController {
         player.attack.add(newCard);
         player.hand.removeCard(newCard);
         player.calculateAttackValue();
+
         return newCard.toString();
     }
 
@@ -319,16 +335,53 @@ public class GameController {
         return false;
     }
 
+    @GetMapping("/set_player_turn")
+    public boolean set_player_turn(@RequestParam(name = "playerNumber", required = false, defaultValue = "0") int playerNumber) {
+        game.playerTurn = playerNumber;
+        game.currentPlayer = playerNumber;
+        System.out.println("Setting current player: " + playerNumber);
+        return false;
+    }
+
     @PostMapping("/resolve_stage_attack")
     public String resolve_stage_attack() {
-        System.out.println("resolve_stage_attack");
-        System.out.println(game.quest.currentStage);
-        return game.resolveStageAttack() + "";
+        System.out.println("resolve_stage_attack"); // REMOVE
+        System.out.println(game.quest.currentStage); // REMOVE
+        game.quest.stages.get(game.quest.currentStage).calculateValue();
+        ArrayList<Integer> result = game.resolveStageAttack();
+
+        System.out.println(game.quest.stages.get(game.quest.currentStage).participants);  // REMOVE
+        StringBuilder str = new StringBuilder();
+        for (Integer integer : result) {
+            str.append(integer).append(" ");
+        }
+        System.out.println("Successful Participants: " + str.toString()); // REMOVE
+        return str.toString();
+    }
+
+    @GetMapping("/next_stage")
+    public int next_stage() {
+        game.quest.currentStage++;
+        return game.quest.currentStage;
     }
 
     @GetMapping("/get_sponsor")
     public int get_sponsor() {
         return game.quest.sponsor.playerNumber;
+    }
+
+    @PostMapping("/get_participants")
+    public String get_participants() {
+        System.out.println("get_participants"); // REMOVE
+        ArrayList<Integer> participants = new ArrayList<>();
+        for (int i = 0; i < game.quest.stages.get(game.quest.currentStage).participants.size(); i++) {
+            Player participant = game.quest.stages.get(game.quest.currentStage).participants.get(i);
+            participants.add(participant.playerNumber);
+        }
+
+        String str = participants + "";
+        System.out.println("Successful Participants: " + str); // REMOVE
+        return str;
     }
 
     @PostMapping("/resolve_quest")

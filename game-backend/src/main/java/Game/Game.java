@@ -552,10 +552,15 @@ public class Game {
     public ArrayList<Integer> resolveStageAttack() {
         ArrayList<Integer> participants = new ArrayList<>();
         System.out.println(quest); // REMOVE
+        System.out.println("Stage value: " + quest.stages.get(quest.currentStage).value);
+
         for (int i = 0; i < quest.stages.get(quest.currentStage).participants.size(); i++) {
             Player participant = quest.stages.get(quest.currentStage).participants.get(i);
             // participants with an attack equal or greater to the value of the current stage are eligible for the next stage
-            if (participant.attackValue >= quest.stages.get(quest.currentStage).value) {
+            System.out.println("Checking if Player " + participant.playerNumber + " has completed the stage");
+            System.out.println("Player " + participant.playerNumber + " has an attack value of " + participant.calculateAttackValue());
+
+            if (participant.calculateAttackValue() >= quest.stages.get(quest.currentStage).value) {
                 // If this is the last stage, they are winners of this quest and earn as many shields as there are stages to this quest.
                 if (quest.numStages - 1 == quest.currentStage) {
                     participant.shields += quest.numStages;
@@ -563,27 +568,31 @@ public class Game {
                 }
                 successfulParticipants.add(participant);
                 participants.add(participant.playerNumber);
+                System.out.println("Player " + participant.playerNumber + " has completed the stage");
             }
             adventureDiscardDeck.addAll(participant.attack);
             participant.attack.removeAll();
             participant.attackValue = 0;
         }
-        if (quest.currentStage < quest.numStages - 1) {
-            quest.stages.get(quest.currentStage + 1).participants = successfulParticipants;
-        }
+//        if (quest.currentStage < quest.numStages - 1) {
+//            return successfulParticipants;
+//            quest.stages.get(quest.currentStage + 1).participants = successfulParticipants;
+//        }
 
         return participants;
     }
 
     public String resolveQuest() {
-        Player sponsor = quest.sponsor;
+        Player sponsor = players.get(quest.sponsor.playerNumber - 1);
         if (quest.numStages - 1 == quest.currentStage || successfulParticipants.isEmpty()) {
             print("Quest completed by players: " + successfulParticipants + "\n");
             // draws the same number of cards + the number of stages, and then possibly trims their hand
+            System.out.println("Sponsor hand before: " + sponsor.hand); // REMOVE
             for (int i = 0; i < quest.countCardsUsed() + quest.numStages; i++) {
-                quest.sponsor.addCard(adventureDeck.drawCard());
+                sponsor.addCard(adventureDeck.drawCard());
             }
-            quest.sponsor.hand.sort();
+            sponsor.hand.sort();
+            System.out.println("Sponsor hand after: " + sponsor.hand); // REMOVE
             for (Stage stage : quest.stages) {
                 adventureDiscardDeck.add(stage.foeCard);
                 stage.foeCard = null;
@@ -593,12 +602,11 @@ public class Game {
             eventDiscardDeck.add(eventCard);
             eventCard = null;
             quest = null;
-            playerTurn = nextTurn();
             return "" + successfulParticipants;
         }
         quest.currentStage++;
-        print("Players continuing the quest: " + quest.stages.get(quest.currentStage).participants + "\n");
-        return "" + quest.stages.get(quest.currentStage).participants;
+        print("Players continuing the quest: " + quest.stages.get(quest.currentStage - 1).participants + "\n");
+        return "" + quest.stages.get(quest.currentStage - 1).participants;
     }
 
     public String resolveStage() {
