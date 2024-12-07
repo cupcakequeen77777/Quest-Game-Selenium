@@ -18,9 +18,10 @@ public class GameController {
     @PostMapping("/start")
     public void startGame() {
         game = new Game();
-        game.distributeCards();
-        // distributeCardsForTesting();
+//        game.distributeCards();
+         distributeCardsForTesting(); // REMOVE
     }
+
 
     @PostMapping("/start_2winner_game_2winner_quest")
     public void start_2winner_game_2winner_quest() {
@@ -47,12 +48,15 @@ public class GameController {
     }
 
     public void distributeCardsForTesting() {
-        String[] events = {"Q2"};
-        String[] P1 = {"F50", "F70", "D5", "D5", "H10", "H10", "S10", "S10", "B15", "B15", "L20", "L20"};
-        String[] P2 = {"F5", "F5", "F10", "F15", "F15", "F20", "F20", "F25", "F30", "F30", "F40", "E30"};
-        String[] P3 = {"F5", "F5", "F10", "F15", "F15", "F20", "F20", "F25", "F25", "F30", "F40", "L20"};
-        String[] P4 = {"F5", "F5", "F10", "F15", "F15", "F20", "F20", "F25", "F25", "F30", "F50", "E30"};
-        String[] cards = {"F5", "F15", "F10", "F5", "F10", "F15", "D5", "D5", "D5", "D5", "H10", "H10", "H10", "H10", "S10", "S10", "S10"};
+        String[] events = {"Q2", "E1"};
+        String[] P1 = {"F5", "F5", "F10", "F10", "F15", "F15", "D5", "H10", "H10", "B15", "B15", "L20"};
+        String[] P2 = {"F40", "F50", "H10", "H10", "S10", "S10", "S10", "B15", "B15", "L20", "L20", "E30"};
+        String[] P3 = {"F5", "F5", "F5", "F5", "D5", "D5", "D5", "H10", "H10", "H10", "H10", "H10"};
+        String[] P4 = {"F50", "F70", "H10", "H10", "S10", "S10", "S10", "B15", "B15", "L20", "L20", "E30"};
+        String[] cards = {
+                "F5", "F40", "F10", "F10", "F30", "F30", "F15", "F15", "F20", "F5", "F10", "F15", "F15",
+                "F20", "F20", "F20", "F20", "F25", "F25", "F30", "F5", "F5", "F15", "F15", "F25", "F25", "F20",
+                "F20", "F25", "F30", "S10", "B15", "B15", "L20"};
         distributeCardsForScenario(events, P1, P2, P3, P4, cards);
     }
 
@@ -62,7 +66,8 @@ public class GameController {
         String[] P2 = {"F40", "F50", "H10", "H10", "S10", "S10", "S10", "B15", "B15", "L20", "L20", "E30"};
         String[] P3 = {"F5", "F5", "F5", "F5", "D5", "D5", "D5", "H10", "H10", "H10", "H10", "H10"};
         String[] P4 = {"F50", "F70", "H10", "H10", "S10", "S10", "S10", "B15", "B15", "L20", "L20", "E30"};
-        String[] cards = {"F5", "F40", "F10", "F10", "F30", "F30", "F15", "F15", "F20", "F5", "F10", "F15", "F15",
+        String[] cards = {
+                "F5", "F40", "F10", "F10", "F30", "F30", "F15", "F15", "F20", "F5", "F10", "F15", "F15",
                 "F20", "F20", "F20", "F20", "F25", "F25", "F30", "F5", "F5", "F15", "F15", "F25", "F25", "F20",
                 "F20", "F25", "F30", "S10", "B15", "B15", "L20"};
 
@@ -196,7 +201,9 @@ public class GameController {
 
     @GetMapping("/next_turn")
     public int next_turn() {
-        return game.nextTurn();
+        int nextTurn = game.nextTurn();
+        System.out.println("Next turn: " + nextTurn);
+        return nextTurn;
     }
 
     @GetMapping("/next_player")

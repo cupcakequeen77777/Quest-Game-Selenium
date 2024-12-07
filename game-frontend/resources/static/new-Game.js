@@ -170,7 +170,6 @@ async function drawEventCard() {
         document.getElementById("player4-hand").innerText = game_state["players"][3]["hand"]
         switch (game_state["eventCard"]) {
             case "Plague":
-                await plague() // REMOVE
                 document.getElementById("card_drawn").innerText += "\nYou lose 2 shields"
                 response = await fetch(`${apiBaseUrl}/play_plague_card`, {method: "POST"});
                 result = await response.text();
