@@ -1,6 +1,6 @@
 # Quest-Game-Selenium
 
-Quest-Game-Selenium is an automated test suite designed to verify the end-to-end functionality of the Quest Game application using Selenium WebDriver. This project showcases a robust, **Test-Driven Development (TDD)** approach, focusing on acceptance testing, UI interaction, and automated regression for the Quest Game web application.
+Quest-Game-Selenium is an automated test suite designed to verify the end-to-end functionality of the Quest Game application using Selenium WebDriver. This project showcases acceptance testing, UI interaction, and automated regression for the Quest Game web application.
 
 The suite covers critical user flows, simulates real player actions, and validates key features to ensure a reliable gaming experience.
 
@@ -16,10 +16,6 @@ The suite covers critical user flows, simulates real player actions, and validat
 ### Iterative Development
 * **Hotseat Approach**: Developed tests that simulate real multi-user scenarios, ensuring the game logic holds in shared or sequential play environments.
 * **Web-Based Automation**: Transitioned from manual to fully automated testing, demonstrating adaptability and code maintainability.
-
-### Test-Driven Development (TDD)
-* **Responsibility Identification**: Broke down user stories into granular test cases, ensuring full coverage of functional requirements.
-* **Commit Structure**: Used a systematic R-TEST/R-CODE strategy to ensure every tested scenario is matched with corresponding automation code.
 
 ### Acceptance Testing
 * **Scenario Path Identification**: Mapped out and automated full user journeys through the Quest Game, emphasizing critical acceptance criteria.
